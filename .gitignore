@@ -1,3 +1,3 @@
 *.pyc
-js/src/build_OPT.OBJ/
+js/src/build*_OPT.OBJ/
 *~
