@@ -59,7 +59,7 @@ class Registers {
 
     static const uint32_t Total = 16;
     static const uint32_t TotalPhys = 16;
-    static const uint32_t Allocatable = 14;
+    static const uint32_t Allocatable = 13;
 
     static const uint32_t AllMask = (1 << Total) - 1;
 
@@ -95,8 +95,7 @@ class Registers {
         (1 << X86Encoding::rbp) |
         (1 << X86Encoding::r12) |
         (1 << X86Encoding::r13) |
-        (1 << X86Encoding::r14) |
-        (1 << X86Encoding::r15);
+        (1 << X86Encoding::r14);
 
     static const uint32_t WrapperMask = VolatileMask;
 
@@ -104,7 +103,8 @@ class Registers {
 
     static const uint32_t NonAllocatableMask =
         (1 << X86Encoding::rsp) |
-        (1 << X86Encoding::r11);      // This is ScratchReg.
+        (1 << X86Encoding::r11) |     // This is ScratchReg.
+        (1 << X86Encoding::r15);
 
     static const uint32_t AllocatableMask = AllMask & ~NonAllocatableMask;
 

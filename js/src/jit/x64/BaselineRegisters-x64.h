@@ -23,7 +23,7 @@ static MOZ_CONSTEXPR_VAR Register BaselineTailCallReg = rsi;
 static MOZ_CONSTEXPR_VAR Register BaselineStubReg     = rdi;
 
 static MOZ_CONSTEXPR_VAR Register ExtractTemp0        = r14;
-static MOZ_CONSTEXPR_VAR Register ExtractTemp1        = r15;
+static MOZ_CONSTEXPR_VAR Register ExtractTemp1        = r13;
 
 // FloatReg0 must be equal to ReturnFloatReg.
 static MOZ_CONSTEXPR_VAR FloatRegister FloatReg0      = xmm0;
