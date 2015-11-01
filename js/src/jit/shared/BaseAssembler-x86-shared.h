@@ -54,6 +54,113 @@ public:
     unsigned char* data() { return m_formatter.data(); }
     bool oom() const { return m_formatter.oom(); }
 
+    /* Variables (initialized to random values) used for
+       constant blinding */
+    int32_t blinding_value;
+    int8_t  blinding_value8;
+    int16_t blinding_value16;
+    int64_t blinding_value64;
+
+    /* Register used for constant blinding */
+    RegisterID blindingReg = RegisterID::r15;
+
+    unsigned char CFopcodes[38] = {
+             0xc3,  // [ret] Return
+             0xcb,  // [Far return] Far return
+             0xcc,  // [int3] Interrupt Type 3
+             0xcf,  // [iret] Interrupt Return
+             0xc9,  // [leave]
+             // Types of conditional jmp
+             0x73, 0x77, 0x72, 0x76, 0xe3, 0x74, 0x7f,
+             0x7d, 0x7c, 0x7e, 0x71, 0x7b, 0x70, 0x7a,
+             0x75, 0x79, 0x0f, 0x82, 0x84, 0x8f, 0x8d,
+             0x8c, 0x83, 0x8e, 0x87, 0x80, 0x81, 0x85,
+             0x88,
+             // Type of un-conditional jmp
+             0xeb, 0xe9, 0xff, 0xea
+    };
+
+    /* Constant blinding version None
+    bool shouldBlindConstant(int32_t imm) {
+        return false;
+    } */
+
+    /* Constant blinding version Full */
+    bool shouldBlindConstant(int32_t imm) {
+        return true;
+    }
+
+    /* Constant blinding version Byte2
+    bool shouldBlindConstant(int32_t imm) {
+        return imm > 0xffff ? true : false;
+    } */
+
+    /* Constant blinding version Conditional
+    bool shouldBlindConstant(int32_t imm) {
+        if(imm > 0x69){
+            for (int i = 0; i < 38; ++i) {
+                if (reinterpret_cast<unsigned char *>(&imm)[0] == CFopcodes[i] ||
+                    reinterpret_cast<unsigned char *>(&imm)[1] == CFopcodes[i] ||
+                    reinterpret_cast<unsigned char *>(&imm)[2] == CFopcodes[i] ||
+                    reinterpret_cast<unsigned char *>(&imm)[3] == CFopcodes[i] )
+                {
+                    return true;
+                }
+            }
+        }
+	return false;
+    } */
+
+    int8_t constantBlindingRand8()
+    {
+        return 0xde;
+    }
+
+    int16_t constantBlindingRand16()
+    {
+        return 0xdead;
+    }
+
+    int32_t constantBlindingRand()
+    {
+        return 0xdeadbeef;
+    }
+
+    int64_t constantBlindingRand64()
+    {
+        return 0xdeadbeeffeedface;
+    }
+
+    inline int32_t blindingValue()
+    {
+        if (blinding_value)
+	    return blinding_value;
+        return blinding_value = constantBlindingRand();
+    }
+
+    inline int8_t blindingValue8()
+    {
+        if (blinding_value8)
+            return blinding_value8;
+        return blinding_value8 = constantBlindingRand8();
+    }
+
+    inline int16_t blindingValue16()
+    {
+        if (blinding_value16)
+            return blinding_value16;
+        blinding_value16 = constantBlindingRand16();
+        return blinding_value16;
+    }
+
+    inline int64_t blindingValue64()
+    {
+        if (blinding_value64)
+            return blinding_value64;
+        blinding_value64 = constantBlindingRand64();
+        return blinding_value64;
+    }
+
     void nop()
     {
         spew("nop");
