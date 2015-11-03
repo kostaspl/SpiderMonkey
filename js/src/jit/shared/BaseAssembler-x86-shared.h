@@ -314,6 +314,28 @@ public:
 
     void addl_im(int32_t imm, int32_t offset, RegisterID base)
     {
+        if (shouldBlindConstant(imm))
+            addl_im_blnd(imm, offset, base);
+        else
+            addl_im_norm(imm, offset, base);
+    }
+
+    void addl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            addl_im_norm(imm - bv, offset, base);
+            addl_im_norm(bv, offset, base);
+        } else {
+            bv = blindingValue();
+            addl_im_norm(imm - bv, offset, base);
+            addl_im_norm(bv, offset, base);
+        }
+    }
+
+    void addl_im_norm(int32_t imm, int32_t offset, RegisterID base)
+    {
         spew("addl       $%d, " MEM_ob, imm, ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, offset, base, GROUP1_OP_ADD);
