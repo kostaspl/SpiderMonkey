@@ -1790,6 +1790,21 @@ public:
 
     void movl_i32r(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            movl_i32r_blnd(imm, dst);
+        else
+            movl_i32r_norm(imm, dst);
+    }
+
+    void movl_i32r_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv = blindingValue();
+        movl_i32r_norm(imm ^ bv, dst);
+        xorl_ir_norm(bv, dst);
+    }
+
+    void movl_i32r_norm(int32_t imm, RegisterID dst)
+    {
         spew("movl       $0x%x, %s", imm, GPReg32Name(dst));
         m_formatter.oneByteOp(OP_MOV_EAXIv, dst);
         m_formatter.immediate32(imm);
