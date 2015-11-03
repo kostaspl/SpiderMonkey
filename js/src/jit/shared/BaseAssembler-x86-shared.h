@@ -908,6 +908,28 @@ public:
 
     void xorl_ir(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            xorl_ir_blnd(imm, dst);
+        else
+            xorl_ir_norm(imm, dst);
+    }
+
+    void xorl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            xorl_ir_norm(imm ^ bv, dst);
+            xorl_ir_norm(bv, dst);
+        } else {
+            bv = blindingValue();
+            xorl_ir_norm(imm ^ bv, dst);
+            xorl_ir_norm(bv, dst);
+        }
+    }
+
+    void xorl_ir_norm(int32_t imm, RegisterID dst)
+    {
         spew("xorl       $%d, %s", imm, GPReg32Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, dst, GROUP1_OP_XOR);
