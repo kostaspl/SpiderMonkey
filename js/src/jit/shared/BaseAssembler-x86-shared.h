@@ -450,6 +450,28 @@ public:
 #endif
     void addl_im(int32_t imm, const void* addr)
     {
+        if (shouldBlindConstant(imm))
+            addl_im_blnd(imm, addr);
+        else
+            addl_im_norm(imm, addr);
+    }
+
+    void addl_im_blnd(int32_t imm, const void* addr)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            addl_im_norm(imm - bv, addr);
+            addl_im_norm(bv, addr);
+        } else {
+            bv = blindingValue();
+            addl_im_norm(imm - bv, addr);
+            addl_im_norm(bv, addr);
+        }
+    }
+
+    void addl_im_norm(int32_t imm, const void* addr)
+    {
         spew("addl       $%d, %p", imm, addr);
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, addr, GROUP1_OP_ADD);
