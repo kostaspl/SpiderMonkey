@@ -908,6 +908,28 @@ public:
 
     void subl_ir(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            subl_ir_blnd(imm, dst);
+        else
+            subl_ir_norm(imm, dst);
+    }
+
+    void subl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            subl_ir_norm(imm - bv, dst);
+            subl_ir_norm(bv, dst);
+        } else {
+            bv = blindingValue();
+            subl_ir_norm(imm - bv, dst);
+            subl_ir_norm(bv, dst);
+        }
+    }
+
+    void subl_ir_norm(int32_t imm, RegisterID dst)
+    {
         spew("subl       $%d, %s", imm, GPReg32Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, dst, GROUP1_OP_SUB);
