@@ -945,6 +945,28 @@ public:
 
     void subl_im(int32_t imm, int32_t offset, RegisterID base)
     {
+        if (shouldBlindConstant(imm))
+            subl_im_blnd(imm, offset, base);
+        else
+            subl_im_norm(imm, offset, base);
+    }
+
+    void subl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            subl_im_norm(imm-bv, offset, base);
+            subl_im_norm(bv, offset, base);
+        } else {
+            bv = blindingValue();
+            subl_im_norm(imm-bv, offset, base);
+            subl_im_norm(bv, offset, base);
+        }
+    }
+
+    void subl_im_norm(int32_t imm, int32_t offset, RegisterID base)
+    {
         spew("subl       $%d, " MEM_ob, imm, ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, offset, base, GROUP1_OP_SUB);
