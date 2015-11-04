@@ -416,6 +416,28 @@ public:
 
     void addq_im(int32_t imm, const void* addr)
     {
+        if (shouldBlindConstant(imm))
+            addq_im_blnd(imm, addr);
+        else
+            addq_im_norm(imm, addr);
+    }
+
+    void addq_im_blnd(int32_t imm, const void* addr)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            addq_im_norm(imm - bv, addr);
+            addq_im_norm(bv, addr);
+        } else {
+            bv = blindingValue();
+            addq_im_norm(imm - bv, addr);
+            addq_im_norm(bv, addr);
+        }
+    }
+
+    void addq_im_norm(int32_t imm, const void* addr)
+    {
         spew("addq       $%d, %p", imm, addr);
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp64(OP_GROUP1_EvIb, addr, GROUP1_OP_ADD);
