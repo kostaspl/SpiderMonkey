@@ -1074,6 +1074,48 @@ public:
     }
 #endif
 
+    /* Custom XOR for imm8. Not really tested */
+    void xorb_i8r(int32_t imm, RegisterID dst)
+    {
+        spew("xorb       $%d, %s", imm, GPReg64Name(dst));
+	m_formatter.oneByteOp(OP_GROUP1_EvIb, dst, GROUP1_OP_XOR);
+	m_formatter.immediate8(imm);
+    }
+
+    /* Custom XOR for imm8. Not really tested */
+    void xorb_i8m(int32_t imm, int32_t offset, RegisterID base)
+    {
+        spew("xorb       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
+	m_formatter.oneByteOp(OP_GROUP1_EvIb, offset, base, GROUP1_OP_XOR);
+	m_formatter.immediate8(imm);
+    }
+
+    /* Custom XOR for imm8. Not really tested */
+    void xorb_i8m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("xorb       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
+	m_formatter.oneByteOp(OP_GROUP1_EvIb, offset, base, index, scale, GROUP1_OP_XOR);
+	m_formatter.immediate8(imm);
+    }
+
+    /* Custom XOR for imm16. Not really tested */
+    void xorw_i16m(int32_t imm, int32_t offset, RegisterID base)
+    {
+        spew("xorw       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
+        m_formatter.prefix(PRE_OPERAND_SIZE);
+        m_formatter.oneByteOp(OP_GROUP1_EvIz, offset, base, GROUP1_OP_XOR);
+        m_formatter.immediate16(imm);
+    }
+
+    /* Custom XOR for imm16. Not really tested */
+    void xorw_i16m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("xorw       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
+        m_formatter.prefix(PRE_OPERAND_SIZE);
+        m_formatter.oneByteOp(OP_GROUP1_EvIz, offset, base, index, scale, GROUP1_OP_XOR);
+        m_formatter.immediate16(imm);
+    }
+
     void xorl_rr(RegisterID src, RegisterID dst)
     {
         spew("xorl       %s, %s", GPReg32Name(src), GPReg32Name(dst));
