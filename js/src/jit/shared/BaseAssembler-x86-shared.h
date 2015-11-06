@@ -840,6 +840,30 @@ public:
 
     void orl_ir(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            orl_ir_blnd(imm, dst);
+        else
+            orl_ir_norm(imm, dst);
+    }
+
+    void orl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir(bv, blindingReg);
+            orl_rr(blindingReg, dst);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir(bv, blindingReg);
+            orl_rr(blindingReg, dst);
+        }
+    }
+
+    void orl_ir_norm(int32_t imm, RegisterID dst)
+    {
         spew("orl        $0x%x, %s", imm, GPReg32Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, dst, GROUP1_OP_OR);
