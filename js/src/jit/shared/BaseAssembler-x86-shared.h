@@ -2050,7 +2050,22 @@ public:
         m_formatter.immediate32(imm);
     }
 
-    void movb_ir(int32_t imm, RegisterID reg)
+    void movb_ir(int32_t imm, RegisterID dst)
+    {
+	if (shouldBlindConstant(imm))
+	    movb_ir_blnd(imm, dst);
+	else
+	    movb_ir_norm(imm, dst);
+    }
+
+    void movb_ir_blnd(int32_t imm, RegisterID dst)
+    {
+	int bv = blindingValue8();
+	movb_ir_norm(imm ^ bv, dst);
+	xorb_i8r(bv, dst);
+    }
+
+    void movb_ir_norm(int32_t imm, RegisterID reg)
     {
         spew("movb       $0x%x, %s", imm, GPReg8Name(reg));
         m_formatter.oneByteOp(OP_MOV_EbGv, reg);
