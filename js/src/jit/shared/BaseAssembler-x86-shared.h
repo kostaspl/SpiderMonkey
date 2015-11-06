@@ -879,6 +879,31 @@ public:
 
     void orl_im(int32_t imm, int32_t offset, RegisterID base)
     {
+        if (shouldBlindConstant(imm))
+            orl_im_blnd(imm, offset, base);
+        else
+            orl_im_norm(imm, offset, base);
+    }
+
+    void orl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir(bv, blindingReg);
+            orl_rm(blindingReg, offset, base);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir(bv, blindingReg);
+            orl_rm(blindingReg, offset, base);
+            orl_rm(blindingReg, offset, base);
+        }
+    }
+
+    void orl_im_norm(int32_t imm, int32_t offset, RegisterID base)
+    {
         spew("orl        $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, offset, base, GROUP1_OP_OR);
