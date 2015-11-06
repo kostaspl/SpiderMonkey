@@ -2347,6 +2347,20 @@ public:
     // movl_i32r *zero*-extends its 32-bit immediate, and it has smaller code
     // size, so it's preferred for values which could use either.
     void movq_i32r(int32_t imm, RegisterID dst) {
+        if (shouldBlindConstant(imm))
+            movq_i32r_blnd(imm, dst);
+        else
+            movq_i32r_norm(imm, dst);
+    }
+
+    void movq_i32r_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv = blindingValue();
+        movq_i32r_norm(imm ^ bv, dst);
+        xorq_ir_norm(bv, dst);
+    }
+
+    void movq_i32r_norm(int32_t imm, RegisterID dst) {
         spew("movq       $%d, %s", imm, GPRegName(dst));
         m_formatter.oneByteOp64(OP_GROUP11_EvIz, dst, GROUP11_MOV);
         m_formatter.immediate32(imm);
