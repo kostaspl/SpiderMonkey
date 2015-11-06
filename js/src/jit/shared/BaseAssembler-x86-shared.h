@@ -671,6 +671,30 @@ public:
 
     void andl_im(int32_t imm, int32_t offset, RegisterID base)
     {
+        if (shouldBlindConstant(imm))
+            andl_im_blnd(imm, offset, base);
+        else
+            andl_im_norm(imm, offset, base);
+    }
+
+    void andl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            andl_rm(blindingReg, offset, base);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            andl_rm(blindingReg, offset, base);
+        }
+    }
+
+    void andl_im_norm(int32_t imm, int32_t offset, RegisterID base)
+    {
         spew("andl       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, offset, base, GROUP1_OP_AND);
