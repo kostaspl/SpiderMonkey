@@ -113,22 +113,22 @@ public:
 
     int8_t constantBlindingRand8()
     {
-        return 0xde;
+        return 0x7e;
     }
 
     int16_t constantBlindingRand16()
     {
-        return 0xdead;
+        return 0x7ead;
     }
 
     int32_t constantBlindingRand()
     {
-        return 0xdeadbeef;
+        return 0x7eadbeef;
     }
 
     int64_t constantBlindingRand64()
     {
-        return 0xdeadbeeffeedface;
+        return 0x7eadbeeffeedface;
     }
 
     inline int32_t blindingValue()
@@ -781,6 +781,30 @@ public:
     }
 
     void andq_ir(int32_t imm, RegisterID dst)
+    {
+        if (shouldBlindConstant(imm))
+            andq_ir_blnd(imm, dst);
+        else
+            andq_ir_norm(imm, dst);
+    }
+
+    void andq_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movq_i32r_norm(imm ^ bv, blindingReg);
+	    xorq_ir_norm(bv, blindingReg);
+            andq_rr(blindingReg, dst);
+        } else {
+            bv = blindingValue();
+            movq_i32r_norm(imm ^ bv, blindingReg);
+	    xorq_ir_norm(bv, blindingReg);
+            andq_rr(blindingReg, dst);
+        }
+    }
+
+    void andq_ir_norm(int32_t imm, RegisterID dst)
     {
         spew("andq       $0x%" PRIx64 ", %s", int64_t(imm), GPReg64Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
