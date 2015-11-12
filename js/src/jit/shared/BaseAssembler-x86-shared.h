@@ -383,6 +383,28 @@ public:
 
     void addq_ir(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            addq_ir_blnd(imm, dst);
+        else
+            addq_ir_norm(imm, dst);
+    }
+
+    void addq_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            addq_ir_norm(imm - bv, dst);
+            addq_ir_norm(bv, dst);
+        } else {
+            bv = blindingValue();
+            addq_ir_norm(imm - bv, dst);
+            addq_ir_norm(bv, dst);
+        }
+    }
+
+    void addq_ir_norm(int32_t imm, RegisterID dst)
+    {
         spew("addq       $%d, %s", imm, GPReg64Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp64(OP_GROUP1_EvIb, dst, GROUP1_OP_ADD);
