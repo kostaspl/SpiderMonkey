@@ -301,7 +301,23 @@ public:
             m_formatter.immediate32(imm);
         }
     }
+
     void addl_i32r(int32_t imm, RegisterID dst)
+    {
+        if (shouldBlindConstant(imm))
+            addl_i32r_blnd(imm, dst);
+        else
+            addl_i32r_norm(imm, dst);
+    }
+
+    void addl_i32r_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv = blindingValue();
+        addl_i32r_norm(imm - bv, dst);
+        addl_i32r_norm(bv, dst);
+    }
+
+    void addl_i32r_norm(int32_t imm, RegisterID dst)
     {
         // 32-bit immediate always, for patching.
         spew("addl       $0x%04x, %s", imm, GPReg32Name(dst));
