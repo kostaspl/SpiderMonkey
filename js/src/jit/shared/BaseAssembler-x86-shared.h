@@ -991,6 +991,30 @@ public:
 
     void orq_ir(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            orq_ir_blnd(imm, dst);
+        else
+            orq_ir_norm(imm, dst);
+    }
+
+    void orq_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movq_i32r_norm(imm ^ bv, blindingReg);
+            xorq_ir_norm(bv, blindingReg);
+            orq_rr(blindingReg, dst);
+        } else {
+            bv = blindingValue();
+            movq_i32r_norm(imm ^ bv, blindingReg);
+            xorq_ir_norm(bv, blindingReg);
+            orq_rr(blindingReg, dst);
+        }
+    }
+
+    void orq_ir_norm(int32_t imm, RegisterID dst)
+    {
         spew("orq        $0x%" PRIx64 ", %s", int64_t(imm), GPReg64Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp64(OP_GROUP1_EvIb, dst, GROUP1_OP_OR);
