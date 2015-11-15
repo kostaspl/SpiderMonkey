@@ -1,2 +1,12 @@
-andl_ir(int32_t imm, RegisterID dst) - Breaks tests (asm.js)
+andl_ir(int32_t imm, RegisterID dst) - Breaks some asm.js tests
 
+movb_im(int32_t imm, int32_t offset, RegisterID base) - Breaks all (?) asm.js tests
+movb_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale) - Breaks all (?) asm.js tests
+movb_im(int32_t imm, const void* addr) - ???
+
+movw_im(int32_t imm, int32_t offset, RegisterID base) - Breaks some asm.js tests
+movw_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale) - Breaks some asm.js tests
+movw_im(int32_t imm, const void* addr) - ???
+
+movl_i32m(int32_t imm, int32_t offset, RegisterID base) - Breaks some asm.js tests
+movl_i32m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale) - ???
