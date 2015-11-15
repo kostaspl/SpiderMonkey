@@ -10,3 +10,21 @@ movw_im(int32_t imm, const void* addr) - ???
 
 movl_i32m(int32_t imm, int32_t offset, RegisterID base) - Breaks some asm.js tests
 movl_i32m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale) - ???
+
+movq_i32m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale) - Breaks asm.js tests
+movq_i32m(int32_t imm, const void* addr) - Breaks asm.js tests
+
+PENDING
+=======
+sarl_ir(int32_t imm, RegisterID dst)
+shrl_ir(int32_t imm, RegisterID dst)
+shll_ir(int32_t imm, RegisterID dst)
+sarq_ir(int32_t imm, RegisterID dst)
+shlq_ir(int32_t imm, RegisterID dst)
+shrq_ir(int32_t imm, RegisterID dst)
+ret_i(int32_t imm)
+push_i(int32_t imm)
+push_i32(int32_t imm)
+adcl_im(int32_t imm, const void* addr)
+andl_im(int32_t imm, const void* addr)
+orl_im(int32_t imm, const void* addr)
