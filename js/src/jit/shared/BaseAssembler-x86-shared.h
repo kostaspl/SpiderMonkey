@@ -1878,6 +1878,30 @@ public:
 
     void cmpw_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
+	if (shouldBlindConstant(imm))
+	    cmpw_im_blnd(imm, offset, base, index, scale);
+	else
+	    cmpw_im_norm(imm, offset, base, index, scale);
+    }
+
+    void cmpw_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpw_rm(blindingReg, offset, base, index, scale);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpw_rm(blindingReg, offset, base, index, scale);
+        }
+    }
+
+    void cmpw_im_norm(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
         spew("cmpw       $%d, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.prefix(PRE_OPERAND_SIZE);
