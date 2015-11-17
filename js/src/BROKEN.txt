@@ -18,6 +18,7 @@ cmpl_ir(int32_t rhs, RegisterID lhs) - Breaks asm.js tests
 cmpl_i32r(int32_t rhs, RegisterID lhs) - Breaks asm.js tests
 
 cmpl_im(int32_t rhs, int32_t offset, RegisterID base) - Breaks one (?) asm.js test
+cmpl_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale) - Breaks one test (dce-with-rinstructions)
 
 PENDING
 =======
@@ -33,3 +34,5 @@ push_i32(int32_t imm)
 adcl_im(int32_t imm, const void* addr)
 andl_im(int32_t imm, const void* addr)
 orl_im(int32_t imm, const void* addr)
+
+Functions with MOZ_WARN_UNUSED_RESULT

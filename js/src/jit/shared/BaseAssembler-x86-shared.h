@@ -1827,6 +1827,22 @@ public:
 
     void cmpl_i32m(int32_t rhs, int32_t offset, RegisterID base)
     {
+	if (shouldBlindConstant(rhs))
+	    cmpl_i32m_blnd(rhs, offset, base);
+	else
+	    cmpl_i32m_norm(rhs, offset, base);
+    }
+
+    void cmpl_i32m_blnd(int32_t rhs, int32_t offset, RegisterID base)
+    {
+	int bv = blindingValue();
+	movl_i32r_norm(rhs ^ bv, blindingReg);
+	xorl_ir_norm(bv, blindingReg);
+	cmpl_rm(blindingReg, offset, base);
+    }
+
+    void cmpl_i32m_norm(int32_t rhs, int32_t offset, RegisterID base)
+    {
         spew("cmpl       $0x%04x, " MEM_ob, rhs, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP1_EvIz, offset, base, GROUP1_OP_CMP);
         m_formatter.immediate32(rhs);
