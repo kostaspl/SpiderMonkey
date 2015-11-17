@@ -1710,7 +1710,39 @@ public:
         }
     }
 
+    void cmpb_rm(RegisterID src, int offset, RegisterID base)
+    {
+        spew("cmpb       %s, " MEM_ob,
+             GPReg8Name(src), ADDR_ob(offset, base));
+	m_formatter.prefix(PRE_OPERAND_SIZE);
+        m_formatter.oneByteOp(OP_CMP_EvGv, src, base, offset);
+    }
+
+    void cmpb_rm(RegisterID src, int offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("cmpb       %s, " MEM_obs,
+             GPReg8Name(src), ADDR_obs(offset, base, index, scale));
+	m_formatter.prefix(PRE_OPERAND_SIZE);
+        m_formatter.oneByteOp(OP_CMP_EvGv, src, base, index, scale, offset);
+    }
+
     void cmpb_im(int32_t rhs, int32_t offset, RegisterID base)
+    {
+	if (shouldBlindConstant(rhs))
+	    cmpb_im_blnd(rhs, offset, base);
+	else
+	    cmpb_im_norm(rhs, offset, base);
+    }
+
+    void cmpb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+	int bv = blindingValue8();
+	movb_ir(imm ^ bv, blindingReg);
+	xorb_i8r(bv, blindingReg);
+	cmpb_rm(blindingReg, offset, base);
+    }
+
+    void cmpb_im_norm(int32_t rhs, int32_t offset, RegisterID base)
     {
         spew("cmpb       $0x%x, " MEM_ob, rhs, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP1_EbIb, offset, base, GROUP1_OP_CMP);
