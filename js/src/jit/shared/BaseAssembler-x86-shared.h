@@ -914,12 +914,12 @@ public:
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
             movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir(bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
             orl_rr(blindingReg, dst);
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir(bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
             orl_rr(blindingReg, dst);
         }
     }
@@ -953,13 +953,12 @@ public:
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
             movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir(bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
             orl_rm(blindingReg, offset, base);
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir(bv, blindingReg);
-            orl_rm(blindingReg, offset, base);
+            xorl_ir_norm(bv, blindingReg);
             orl_rm(blindingReg, offset, base);
         }
     }
@@ -1737,7 +1736,7 @@ public:
     void cmpb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
 	int bv = blindingValue8();
-	movb_ir(imm ^ bv, blindingReg);
+	movb_ir_norm(imm ^ bv, blindingReg);
 	xorb_i8r(bv, blindingReg);
 	cmpb_rm(blindingReg, offset, base);
     }
@@ -1770,6 +1769,14 @@ public:
         spew("cmpb       $0x%x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP1_EbIb, offset, base, index, scale, GROUP1_OP_CMP);
         m_formatter.immediate8(rhs);
+    }
+
+    void cmpl_rm(RegisterID src, int offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("cmpl       %s, " MEM_obs,
+             GPReg16Name(src), ADDR_obs(offset, base, index, scale));
+        m_formatter.prefix(PRE_OPERAND_SIZE);
+        m_formatter.oneByteOp(OP_CMP_EvGv, src, base, index, scale, offset);
     }
 
     void cmpl_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
