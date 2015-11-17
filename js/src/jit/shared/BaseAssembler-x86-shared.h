@@ -1714,7 +1714,7 @@ public:
         spew("cmpb       %s, " MEM_ob,
              GPReg8Name(src), ADDR_ob(offset, base));
 	m_formatter.prefix(PRE_OPERAND_SIZE);
-        m_formatter.oneByteOp(OP_CMP_EvGv, src, base, offset);
+        m_formatter.oneByteOp(OP_CMP_EvGv, offset, base, src);
     }
 
     void cmpb_rm(RegisterID src, int offset, RegisterID base, RegisterID index, int scale)
@@ -1722,7 +1722,7 @@ public:
         spew("cmpb       %s, " MEM_obs,
              GPReg8Name(src), ADDR_obs(offset, base, index, scale));
 	m_formatter.prefix(PRE_OPERAND_SIZE);
-        m_formatter.oneByteOp(OP_CMP_EvGv, src, base, index, scale, offset);
+        m_formatter.oneByteOp(OP_CMP_EvGv, offset, base, index, scale, src);
     }
 
     void cmpb_im(int32_t rhs, int32_t offset, RegisterID base)
@@ -1776,7 +1776,7 @@ public:
         spew("cmpl       %s, " MEM_obs,
              GPReg16Name(src), ADDR_obs(offset, base, index, scale));
         m_formatter.prefix(PRE_OPERAND_SIZE);
-        m_formatter.oneByteOp(OP_CMP_EvGv, src, base, index, scale, offset);
+        m_formatter.oneByteOp(OP_CMP_EvGv, offset, base, index, scale, src);
     }
 
     void cmpl_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
