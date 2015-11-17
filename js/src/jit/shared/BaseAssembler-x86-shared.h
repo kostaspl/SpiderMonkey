@@ -1751,6 +1751,22 @@ public:
 
     void cmpb_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
+	if (shouldBlindConstant(rhs))
+	    cmpb_im_blnd(rhs, offset, base, index, scale);
+	else
+	    cmpb_im_norm(rhs, offset, base, index, scale);
+    }
+
+    void cmpb_im_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        int bv = blindingValue8();
+        movb_ir_norm(rhs ^ bv, blindingReg);
+        xorb_i8r(bv, blindingReg);
+        cmpb_rm(blindingReg, offset, base, index, scale);
+    }
+
+    void cmpb_im_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
         spew("cmpb       $0x%x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP1_EbIb, offset, base, index, scale, GROUP1_OP_CMP);
         m_formatter.immediate8(rhs);
