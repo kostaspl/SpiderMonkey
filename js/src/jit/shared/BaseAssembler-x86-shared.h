@@ -2050,10 +2050,22 @@ public:
         m_formatter.oneByteOp(OP_TEST_EvGv, offset, base, src);
     }
 
+    void testl_rm(RegisterID src, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("testl       %s, " MEM_obs, GPReg32Name(src), ADDR_obs(offset, base, index, scale));
+        m_formatter.oneByteOp(OP_TEST_EvGv, offset, base, index, scale, src);
+    }
+
     void testb_rm(RegisterID src, int32_t offset, RegisterID base)
     {
         spew("testb       %s, " MEM_ob, GPReg8Name(src), ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_TEST_EbGb, offset, base, src);
+    }
+
+    void testb_rm(RegisterID src, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("testb       %s, " MEM_obs, GPReg32Name(src), ADDR_obs(offset, base, index, scale));
+        m_formatter.oneByteOp(OP_TEST_EbGb, offset, base, index, scale, src);
     }
 
     void testl_i32m(int32_t rhs, int32_t offset, RegisterID base)
@@ -2110,6 +2122,22 @@ public:
     }
 
     void testb_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+	if (shouldBlindConstant(rhs))
+	    testb_im_blnd(rhs, offset, base, index, scale);
+	else
+	    testb_im_norm(rhs, offset, base, index, scale);
+    }
+
+    void testb_im_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+	int bv = blindingValue8();
+	movb_ir_norm(rhs ^ bv, blindingReg);
+	xorb_i8r(bv, blindingReg);
+	testb_rm(blindingReg, offset, base, index, scale);
+    }
+
+    void testb_im_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("testb      $0x%x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP3_EbIb, offset, base, index, scale, GROUP3_OP_TEST);
