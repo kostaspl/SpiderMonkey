@@ -2044,7 +2044,29 @@ public:
         m_formatter.immediate32(rhs);
     }
 
+    void testl_rm(RegisterID src, int32_t offset, RegisterID base)
+    {
+        spew("testl       %s, " MEM_ob, GPReg32Name(src), ADDR_ob(offset, base));
+        m_formatter.oneByteOp(OP_TEST_EvGv, offset, base, src);
+    }
+
     void testl_i32m(int32_t rhs, int32_t offset, RegisterID base)
+    {
+	if (shouldBlindConstant(rhs))
+	    testl_i32m_norm(rhs, offset, base);
+	else
+	    testl_i32m_norm(rhs, offset, base);
+    }
+
+    void testl_i32m_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+	int bv = blindingValue();
+	movl_i32r_norm(imm ^ bv, blindingReg);
+	xorl_ir_norm(bv, blindingReg);
+	testl_rm(blindingReg, offset, base);
+    }
+
+    void testl_i32m_norm(int32_t rhs, int32_t offset, RegisterID base)
     {
         spew("testl      $0x%x, " MEM_ob, rhs, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP3_EvIz, offset, base, GROUP3_OP_TEST);

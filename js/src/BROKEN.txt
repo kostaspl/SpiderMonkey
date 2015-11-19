@@ -19,6 +19,15 @@ cmpl_i32r(int32_t rhs, RegisterID lhs) - Breaks asm.js tests
 
 cmpl_im(int32_t rhs, int32_t offset, RegisterID base) - Breaks one (?) asm.js test
 cmpl_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale) - Breaks one test (dce-with-rinstructions)
+cmpl_im(int32_t imm, const void* addr) - Breaks JS tests
+
+cmpq_ir(int32_t rhs, RegisterID lhs) - Breaks asm.js tests plus one more
+
+cmpq_im(int32_t rhs, int32_t offset, RegisterID base) - Breaks some JS tests
+cmpq_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale) - ???
+cmpq_im(int32_t rhs, const void* addr) - ???
+
+testl_ir(int32_t rhs, RegisterID lhs) - Breaks all (?) asmjs tests and some more.
 
 PENDING
 =======
