@@ -36,7 +36,7 @@
 #include "jit/shared/Encoding-x86-shared.h"
 #include "jit/shared/Patching-x86-shared.h"
 
-#define BLND_FUNC spew("@@@ %s:%d @@@", __func__, __LINE__);
+#define BLND_FUNC spew("@@@ %s:%d @@@", __func__, __LINE__)
 
 namespace js {
 namespace jit {
@@ -277,7 +277,7 @@ public:
 
     void addl_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -315,7 +315,7 @@ public:
 
     void addl_i32r_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv = blindingValue();
         addl_i32r_norm(imm - bv, dst);
         addl_i32r_norm(bv, dst);
@@ -342,7 +342,7 @@ public:
 
     void addl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -396,7 +396,7 @@ public:
 
     void addq_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -434,7 +434,7 @@ public:
 
     void addq_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -469,7 +469,7 @@ public:
 
     void addq_im_blnd(int32_t imm, const void* addr)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -504,7 +504,7 @@ public:
 
     void addl_im_blnd(int32_t imm, const void* addr)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -726,7 +726,7 @@ public:
 
     void andl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -800,7 +800,7 @@ public:
 
     void andq_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -921,7 +921,7 @@ public:
 
     void orl_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -961,7 +961,7 @@ public:
 
     void orl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1011,7 +1011,7 @@ public:
 
     void orq_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1088,7 +1088,7 @@ public:
 
     void subl_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1126,7 +1126,7 @@ public:
 
     void subl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1186,7 +1186,7 @@ public:
 
     void subq_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1224,7 +1224,7 @@ public:
 
     void subl_im_blnd(int32_t imm, const void* addr)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1345,7 +1345,7 @@ public:
 
     void xorl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1380,7 +1380,7 @@ public:
 
     void xorl_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1425,7 +1425,7 @@ public:
 
     void xorq_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -1756,7 +1756,7 @@ public:
 
     void cmpb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
 	int bv = blindingValue8();
 	movb_ir_norm(imm ^ bv, blindingReg);
 	xorb_i8r(bv, blindingReg);
@@ -1780,7 +1780,7 @@ public:
 
     void cmpb_im_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv = blindingValue8();
         movb_ir_norm(rhs ^ bv, blindingReg);
         xorb_i8r(bv, blindingReg);
@@ -1858,7 +1858,7 @@ public:
 
     void cmpl_i32m_blnd(int32_t rhs, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
 	int bv = blindingValue();
 	movl_i32r_norm(rhs ^ bv, blindingReg);
 	xorl_ir_norm(bv, blindingReg);
@@ -2006,7 +2006,7 @@ public:
 
     void cmpw_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             bv = blindingValue8();
@@ -2117,7 +2117,7 @@ public:
 
     void testb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
 	int bv = blindingValue8();
 	movb_ir_norm(imm ^ bv, blindingReg);
 	xorb_i8r(bv, blindingReg);
@@ -2141,7 +2141,7 @@ public:
 
     void testb_im_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
-        BLND_FUNC
+        BLND_FUNC;
 	int bv = blindingValue8();
 	movb_ir_norm(rhs ^ bv, blindingReg);
 	xorb_i8r(bv, blindingReg);
@@ -2400,7 +2400,7 @@ public:
 
     void movl_i32r_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv = blindingValue();
         movl_i32r_norm(imm ^ bv, dst);
         xorl_ir_norm(bv, dst);
@@ -2423,7 +2423,7 @@ public:
 
     void movb_ir_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
 	int bv = blindingValue8();
 	movb_ir_norm(imm ^ bv, dst);
 	xorb_i8r(bv, dst);
@@ -2670,7 +2670,7 @@ public:
 
     void movq_i32m_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv = blindingValue();
         movq_i32m_norm(imm ^ bv, offset, base);
         xorq_i32m(bv, offset, base);
@@ -2711,7 +2711,7 @@ public:
 
     void movq_i32r_blnd(int32_t imm, RegisterID dst)
     {
-        BLND_FUNC
+        BLND_FUNC;
         int bv = blindingValue();
         movq_i32r_norm(imm ^ bv, dst);
         xorq_ir_norm(bv, dst);
