@@ -800,6 +800,7 @@ public:
 
     void andq_ir_blnd(int32_t imm, RegisterID dst)
     {
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             andq_ir_norm(imm, dst); // TODO: is this ok?
@@ -917,6 +918,7 @@ public:
 
     void orl_ir_blnd(int32_t imm, RegisterID dst)
     {
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             orl_ir_norm(imm, dst); // TODO: is this ok?
@@ -953,6 +955,7 @@ public:
 
     void orl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             orl_im_norm(imm, offset, base); // TODO: is this ok?
@@ -992,16 +995,17 @@ public:
     void orq_ir(int32_t imm, RegisterID dst)
     {
         if (shouldBlindConstant(imm))
-            orq_ir_blnd(imm, dst); // TODO: is this ok?
+            orq_ir_blnd(imm, dst);
         else
             orq_ir_norm(imm, dst);
     }
 
     void orq_ir_blnd(int32_t imm, RegisterID dst)
     {
+        BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            orq_ir_norm(imm, dst);
+            orq_ir_norm(imm, dst); // TODO: is this ok?
         } else {
             bv = blindingValue();
             movq_i32r_norm(imm ^ bv, blindingReg);
