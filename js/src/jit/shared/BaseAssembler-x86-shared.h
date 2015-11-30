@@ -790,32 +790,8 @@ public:
         m_formatter.oneByteOp64(OP_OR_GvEv, addr, dst);
     }
 
+    /* BREAKS A LOT OF ASM JS TESTS incl. testBasic (in opt build) ???!!! */
     void andq_ir(int32_t imm, RegisterID dst)
-    {
-        if (shouldBlindConstant(imm))
-            andq_ir_blnd(imm, dst);
-        else
-            andq_ir_norm(imm, dst);
-    }
-
-    void andq_ir_blnd(int32_t imm, RegisterID dst)
-    {
-        BLND_FUNC;
-        int bv;
-        if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movq_i32r_norm(imm ^ bv, blindingReg);
-	    xorq_ir_norm(bv, blindingReg);
-            andq_rr(blindingReg, dst);
-        } else {
-            bv = blindingValue();
-            movq_i32r_norm(imm ^ bv, blindingReg);
-	    xorq_ir_norm(bv, blindingReg);
-            andq_rr(blindingReg, dst);
-        }
-    }
-
-    void andq_ir_norm(int32_t imm, RegisterID dst)
     {
         spew("andq       $0x%" PRIx64 ", %s", int64_t(imm), GPReg64Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
@@ -911,32 +887,8 @@ public:
         m_formatter.oneByteOp(OP_OR_EvGv, offset, base, src);
     }
 
+    /* BREAKS ASM JS TEST in opt build - testBullet */
     void orl_ir(int32_t imm, RegisterID dst)
-    {
-        if (shouldBlindConstant(imm))
-            orl_ir_blnd(imm, dst);
-        else
-            orl_ir_norm(imm, dst);
-    }
-
-    void orl_ir_blnd(int32_t imm, RegisterID dst)
-    {
-        BLND_FUNC;
-        int bv;
-        if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            orl_rr(blindingReg, dst);
-        } else {
-            bv = blindingValue();
-            movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            orl_rr(blindingReg, dst);
-        }
-    }
-
-    void orl_ir_norm(int32_t imm, RegisterID dst)
     {
         spew("orl        $0x%x, %s", imm, GPReg32Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
@@ -951,32 +903,8 @@ public:
         }
     }
 
+    /* BREAKS ASM JS TEST in opt build - testFFI */
     void orl_im(int32_t imm, int32_t offset, RegisterID base)
-    {
-        if (shouldBlindConstant(imm))
-            orl_im_blnd(imm, offset, base);
-        else
-            orl_im_norm(imm, offset, base);
-    }
-
-    void orl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
-    {
-        BLND_FUNC;
-        int bv;
-        if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            orl_rm(blindingReg, offset, base);
-        } else {
-            bv = blindingValue();
-            movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            orl_rm(blindingReg, offset, base);
-        }
-    }
-
-    void orl_im_norm(int32_t imm, int32_t offset, RegisterID base)
     {
         spew("orl        $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
@@ -1001,32 +929,8 @@ public:
         m_formatter.oneByteOp64(OP_OR_GvEv, src, dst);
     }
 
+    /* BREAKS TONS OF ASM JS (and other) TESTS */
     void orq_ir(int32_t imm, RegisterID dst)
-    {
-        if (shouldBlindConstant(imm))
-            orq_ir_blnd(imm, dst);
-        else
-            orq_ir_norm(imm, dst);
-    }
-
-    void orq_ir_blnd(int32_t imm, RegisterID dst)
-    {
-        BLND_FUNC;
-        int bv;
-        if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movq_i32r_norm(imm ^ bv, blindingReg);
-            xorq_ir_norm(bv, blindingReg);
-            orq_rr(blindingReg, dst);
-        } else {
-            bv = blindingValue();
-            movq_i32r_norm(imm ^ bv, blindingReg);
-            xorq_ir_norm(bv, blindingReg);
-            orq_rr(blindingReg, dst);
-        }
-    }
-
-    void orq_ir_norm(int32_t imm, RegisterID dst)
     {
         spew("orq        $0x%" PRIx64 ", %s", int64_t(imm), GPReg64Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
