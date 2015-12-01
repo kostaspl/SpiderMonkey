@@ -2034,6 +2034,7 @@ public:
 
     void testl_ir_blnd(int32_t imm, RegisterID dst)
     {
+        BLND_FUNC;
 	int bv = blindingValue();
 	movl_i32r_norm(imm ^ bv, blindingReg);
 	xorl_ir_norm(bv, blindingReg);
