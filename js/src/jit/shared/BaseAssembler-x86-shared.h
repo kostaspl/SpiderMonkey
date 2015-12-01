@@ -962,7 +962,7 @@ public:
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir(bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
             orl_rm(blindingReg, offset, base);
         }
     }
@@ -2648,6 +2648,22 @@ public:
     }
 
     void movq_i32m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        if (shouldBlindConstant(imm))
+            movq_i32m_blnd(imm, offset, base, index, scale);
+        else
+            movq_i32m_norm(imm, offset, base, index, scale);
+    }
+
+    void movq_i32m_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movq_i32m_norm(imm ^ bv, offset, base, index, scale);
+        xorq_i32m(imm, offset, base, index, scale);
+    }
+
+    void movq_i32m_norm(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("movq       $%d, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp64(OP_GROUP11_EvIz, offset, base, index, scale, GROUP11_MOV);
