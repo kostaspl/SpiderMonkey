@@ -2025,6 +2025,35 @@ public:
             testb_ir_norex(rhs >> 8, GetSubregH(lhs));
             return;
         }
+
+	if (shouldBlindConstant(rhs))
+	    testl_ir_blnd(rhs, lhs);
+	else
+	    testl_ir_norm(rhs, lhs);
+    }
+
+    void testl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+	int bv = blindingValue();
+	movl_i32r_norm(imm ^ bv, blindingReg);
+	xorl_ir_norm(bv, blindingReg);
+	testl_rr(blindingReg,  dst);
+    }
+
+    void testl_ir_norm(int32_t rhs, RegisterID lhs)
+    {
+        // If the mask fits in an 8-bit immediate, we can use testb with an
+        // 8-bit subreg.
+        if (CAN_ZERO_EXTEND_8_32(rhs) && HasSubregL(lhs)) {
+            testb_ir(rhs, lhs);
+            return;
+        }
+        // If the mask is a subset of 0xff00, we can use testb with an h reg, if
+        // one happens to be available.
+        if (CAN_ZERO_EXTEND_8H_32(rhs) && HasSubregH(lhs)) {
+            testb_ir_norex(rhs >> 8, GetSubregH(lhs));
+            return;
+        }
         spew("testl      $0x%x, %s", rhs, GPReg32Name(lhs));
         if (lhs == rax)
             m_formatter.oneByteOp(OP_TEST_EAXIv);
