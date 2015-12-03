@@ -2025,36 +2025,6 @@ public:
             testb_ir_norex(rhs >> 8, GetSubregH(lhs));
             return;
         }
-
-	if (shouldBlindConstant(rhs))
-	    testl_ir_blnd(rhs, lhs);
-	else
-	    testl_ir_norm(rhs, lhs);
-    }
-
-    void testl_ir_blnd(int32_t imm, RegisterID dst)
-    {
-        BLND_FUNC;
-	int bv = blindingValue();
-	movl_i32r_norm(imm ^ bv, blindingReg);
-	xorl_ir_norm(bv, blindingReg);
-	testl_rr(blindingReg,  dst);
-    }
-
-    void testl_ir_norm(int32_t rhs, RegisterID lhs)
-    {
-        // If the mask fits in an 8-bit immediate, we can use testb with an
-        // 8-bit subreg.
-        if (CAN_ZERO_EXTEND_8_32(rhs) && HasSubregL(lhs)) {
-            testb_ir(rhs, lhs);
-            return;
-        }
-        // If the mask is a subset of 0xff00, we can use testb with an h reg, if
-        // one happens to be available.
-        if (CAN_ZERO_EXTEND_8H_32(rhs) && HasSubregH(lhs)) {
-            testb_ir_norex(rhs >> 8, GetSubregH(lhs));
-            return;
-        }
         spew("testl      $0x%x, %s", rhs, GPReg32Name(lhs));
         if (lhs == rax)
             m_formatter.oneByteOp(OP_TEST_EAXIv);
@@ -2699,7 +2669,24 @@ public:
         m_formatter.oneByteOp64(OP_GROUP11_EvIz, offset, base, index, scale, GROUP11_MOV);
         m_formatter.immediate32(imm);
     }
+
     void movq_i32m(int32_t imm, const void* addr)
+    {
+        if (shouldBlindConstant(imm))
+            movq_i32m_blnd(imm, addr);
+        else
+            movq_i32m_norm(imm, addr);
+    }
+
+    void movq_i32m_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movq_i32m_norm(imm - bv, addr);
+        addq_im_norm(bv, addr);
+    }
+
+    void movq_i32m_norm(int32_t imm, const void* addr)
     {
         spew("movq       $%d, %p", imm, addr);
         m_formatter.oneByteOp64(OP_GROUP11_EvIz, addr, GROUP11_MOV);
