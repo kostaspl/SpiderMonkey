@@ -1858,7 +1858,24 @@ public:
         m_formatter.immediate32(rhs);
     }
 
-    void cmpl_i32m(int32_t rhs, const void* addr)
+    void cmpl_i32m(int32_t imm, const void* addr)
+    {
+	if (shouldBlindConstant(imm))
+	    cmpl_i32m_blnd(imm, addr);
+	else
+	    cmpl_i32m_norm(imm, addr);
+    }
+
+    void cmpl_i32m_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movl_i32r_norm(imm ^ bv, blindingReg);
+        xorl_ir_norm(bv, blindingReg);
+        cmpl_rm(blindingReg, addr);
+    }
+
+    void cmpl_i32m_norm(int32_t rhs, const void* addr)
     {
         spew("cmpl       $0x%04x, %p", rhs, addr);
         m_formatter.oneByteOp(OP_GROUP1_EvIz, addr, GROUP1_OP_CMP);
