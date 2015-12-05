@@ -1672,7 +1672,29 @@ public:
         }
     }
 
-    void cmpl_i32r(int32_t rhs, RegisterID lhs)
+    void cmpl_i32r(int32_t imm, RegisterID dst)
+    {
+	if (shouldBlindConstant(imm))
+            cmpl_i32r_blnd(imm, dst);
+        else
+            cmpl_i32r_norm(imm, dst);
+    }
+
+    void cmpl_i32r_blnd(int32_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpl_i32r_norm(imm, dst); // TODO: is this ok?
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpl_rr(blindingReg, dst);
+        }
+    }
+
+    void cmpl_i32r_norm(int32_t rhs, RegisterID lhs)
     {
         spew("cmpl       $0x%04x, %s", rhs, GPReg32Name(lhs));
         if (lhs == rax)
@@ -1779,7 +1801,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-	    cmpl_im_norm(imm, offset, base, index, scale);
+	    cmpl_im_norm(imm, offset, base, index, scale); // TODO: is this ok?
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm^bv, blindingReg);
