@@ -1766,7 +1766,29 @@ public:
         m_formatter.oneByteOp(OP_CMP_EvGv, offset, base, index, scale, src);
     }
 
-    void cmpl_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    void cmpl_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+	if (shouldBlindConstant(imm))
+	    cmpl_im_blnd(imm, offset, base, index, scale);
+	else
+	    cmpl_im_norm(imm, offset, base, index, scale);
+    }
+
+    void cmpl_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+	    cmpl_im_norm(imm, offset, base, index, scale);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpl_rm(blindingReg, offset, base, index, scale);
+        }
+    }
+
+    void cmpl_im_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("cmpl       $0x%x, " MEM_o32b, rhs, ADDR_o32b(offset, base));
         if (CAN_SIGN_EXTEND_8_32(rhs)) {
