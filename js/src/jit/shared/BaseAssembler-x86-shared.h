@@ -1036,6 +1036,37 @@ public:
 #else
     void orl_im(int32_t imm, const void* addr)
     {
+        if (shouldBlindConstant(imm))
+            orl_im_blnd(imm, addr);
+        else
+            orl_im_norm(imm, addr);
+    }
+
+    void orl_im_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            orl_rm(blindingReg, addr);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            orl_rm(blindingReg, addr);
+        }
+    }
+
+    void orl_rm(RegisterID src, const void* addr)
+    {
+        spew("orl        %s, " MEM_ob, GPReg32Name(src), addr);
+        m_formatter.oneByteOp(OP_OR_EvGv, addr, src);
+    }
+
+    void orl_im_norm(int32_t imm, const void* addr)
+    {
         spew("orl        $0x%x, %p", imm, addr);
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, addr, GROUP1_OP_OR);
