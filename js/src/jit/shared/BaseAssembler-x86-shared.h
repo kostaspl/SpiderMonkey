@@ -1974,7 +1974,29 @@ public:
         }
     }
 
-    void cmpq_im(int32_t rhs, int32_t offset, RegisterID base)
+    void cmpq_im(int32_t imm, int32_t offset, RegisterID base)
+    {
+	if (shouldBlindConstant(imm))
+	    cmpq_im_blnd(imm, offset, base);
+	else
+	    cmpq_im_norm(imm, offset, base);
+    }
+
+    void cmpq_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpq_im_norm(imm, offset, base); // TODO: is this ok?
+        } else {
+            bv = blindingValue();
+            movq_i32r_norm(imm ^ bv, blindingReg);
+            xorq_ir_norm(bv, blindingReg);
+            cmpq_rm(blindingReg, offset, base);
+        }
+    }
+
+    void cmpq_im_norm(int32_t rhs, int32_t offset, RegisterID base)
     {
         spew("cmpq       $0x%" PRIx64 ", " MEM_ob, int64_t(rhs), ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(rhs)) {
