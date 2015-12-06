@@ -1995,7 +1995,29 @@ public:
         m_formatter.oneByteOp_disp32(OP_CMP_EvGv, addr, rhs);
     }
 
-    void cmpl_im(int32_t rhs, const void* addr)
+    void cmpl_im(int32_t imm, const void* addr)
+    {
+	if (shouldBlindConstant(imm))
+	    cmpl_im_blnd(imm, addr);
+	else
+	    cmpl_im_norm(imm, addr);
+    }
+
+    void cmpl_im_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+	int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpl_im_norm(imm, addr); // TODO: is this ok?
+	} else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpl_rm(blindingReg, addr);
+	}
+    }
+
+    void cmpl_im_norm(int32_t rhs, const void* addr)
     {
         spew("cmpl       $0x%x, %p", rhs, addr);
         if (CAN_SIGN_EXTEND_8_32(rhs)) {
