@@ -2008,7 +2008,35 @@ public:
         }
     }
 
-    void cmpq_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    void cmpq_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+	if (shouldBlindConstant(imm))
+	    cmpq_im_blnd(imm, offset, base, index, scale);
+	else
+	    cmpq_im_norm(imm, offset, base, index, scale);
+    }
+
+    void cmpq_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpq_im_norm(imm, offset, base); // TODO: is this ok?
+        } else {
+            bv = blindingValue();
+            movq_i32r_norm(imm ^ bv, blindingReg);
+            xorq_ir_norm(bv, blindingReg);
+            cmpq_rm(blindingReg, offset, base, index, scale);
+        }
+    }
+
+    void cmpq_rm(RegisterID src, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("cmpl       %s, " MEM_obs, GPReg32Name(src), ADDR_obs(offset, base, index, scale));
+        m_formatter.oneByteOp64(OP_CMP_EvGv, offset, base, index, scale, src);
+    }
+
+    void cmpq_im_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("cmpq       $0x%x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         if (CAN_SIGN_EXTEND_8_32(rhs)) {
