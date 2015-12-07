@@ -2047,7 +2047,29 @@ public:
             m_formatter.immediate32(rhs);
         }
     }
-    void cmpq_im(int32_t rhs, const void* addr)
+    void cmpq_im(int32_t imm, const void* addr)
+    {
+	if (shouldBlindConstant(imm))
+            cmpq_im_blnd(imm, addr);
+	else
+            cmpq_im_norm(imm, addr);
+    }
+
+    void cmpq_im_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+	int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpq_im_norm(imm, addr); // TODO: is this ok?
+	} else {
+            bv = blindingValue();
+            movq_i32r_norm(imm^bv, blindingReg);
+            xorq_ir_norm(bv, blindingReg);
+            cmpq_rm(blindingReg, addr);
+	}
+    }
+
+    void cmpq_im_norm(int32_t rhs, const void* addr)
     {
         spew("cmpq       $0x%" PRIx64 ", %p", int64_t(rhs), addr);
         if (CAN_SIGN_EXTEND_8_32(rhs)) {
