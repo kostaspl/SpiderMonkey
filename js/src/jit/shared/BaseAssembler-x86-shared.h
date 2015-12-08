@@ -2349,7 +2349,6 @@ public:
         int bv = blindingValue();
         movq_i32r_norm(imm ^ bv, blindingReg);
         xorq_ir_norm(bv, blindingReg);
-        addq_ir_norm(offset, base);
         testq_rm(blindingReg, offset, base);
     }
 
@@ -2368,9 +2367,32 @@ public:
 
     void testq_i32m(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
+        if (shouldBlindConstant(rhs))
+            testq_i32m_blnd(rhs, offset, base, index, scale);
+        else
+            testq_i32m_norm(rhs, offset, base, index, scale);
+    }
+
+    void testq_i32m_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movq_i32r_norm(imm ^ bv, blindingReg);
+        xorq_ir_norm(bv, blindingReg);
+        testq_rm(blindingReg, offset, base, index, scale);
+    }
+
+    void testq_i32m_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
         spew("testq      $0x%4x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp64(OP_GROUP3_EvIz, offset, base, index, scale, GROUP3_OP_TEST);
         m_formatter.immediate32(rhs);
+    }
+
+    void testq_rm(RegisterID src, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("testq      %s, " MEM_obs, GPReg64Name(src), ADDR_obs(offset, base, index, scale));
+        m_formatter.oneByteOp64(OP_TEST_EvGv, offset, base, index, scale, src);
     }
 #endif
 
