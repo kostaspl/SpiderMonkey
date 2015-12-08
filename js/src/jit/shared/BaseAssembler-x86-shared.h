@@ -2337,6 +2337,30 @@ public:
 
     void testq_i32m(int32_t rhs, int32_t offset, RegisterID base)
     {
+        if (shouldBlindConstant(rhs))
+            testq_i32m_blnd(rhs, offset, base);
+        else
+            testq_i32m_norm(rhs, offset, base);
+    }
+
+    void testq_i32m_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movq_i32r_norm(imm ^ bv, blindingReg);
+        xorq_ir_norm(bv, blindingReg);
+        addq_ir_norm(offset, base);
+        testq_rm(blindingReg, offset, base);
+    }
+
+    void testq_rm(RegisterID src, int32_t offset, RegisterID base)
+    {
+        spew("testq      %s, " MEM_ob, GPReg64Name(src), ADDR_ob(offset, base));
+        m_formatter.oneByteOp64(OP_TEST_EvGv, offset, base, src);
+    }
+
+    void testq_i32m_norm(int32_t rhs, int32_t offset, RegisterID base)
+    {
         spew("testq      $0x%" PRIx64 ", " MEM_ob, int64_t(rhs), ADDR_ob(offset, base));
         m_formatter.oneByteOp64(OP_GROUP3_EvIz, offset, base, GROUP3_OP_TEST);
         m_formatter.immediate32(rhs);
