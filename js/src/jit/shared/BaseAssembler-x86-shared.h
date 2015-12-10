@@ -3019,6 +3019,22 @@ public:
 
     void movl_i32m(int32_t imm, const void* addr)
     {
+	if (shouldBlindConstant(imm))
+	    movl_i32m_blnd(imm, addr);
+	else
+	    movl_i32m_norm(imm, addr);
+    }
+
+    void movl_i32m_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+	int bv = blindingValue();
+	movl_i32m_norm(imm-bv, addr);
+	addl_im_norm(bv, addr);
+    }
+
+    void movl_i32m_norm(int32_t imm, const void* addr)
+    {
         spew("movl       $%d, %p", imm, addr);
         m_formatter.oneByteOp(OP_GROUP11_EvIz, addr, GROUP11_MOV);
         m_formatter.immediate32(imm);
