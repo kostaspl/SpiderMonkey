@@ -2307,6 +2307,23 @@ public:
 
     void testl_i32m(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
+	if (shouldBlindConstant(rhs))
+	    testl_i32m_blnd(rhs, offset, base, index, scale);
+	else
+	    testl_i32m_norm(rhs, offset, base, index, scale);
+    }
+
+    void testl_i32m_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+	int bv = blindingValue();
+	movl_i32r_norm(rhs^bv, blindingReg);
+	xorl_ir_norm(bv, blindingReg);
+	testl_rm(blindingReg, offset, base, index, scale);
+    }
+
+    void testl_i32m_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
         spew("testl      $0x%4x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP3_EvIz, offset, base, index, scale, GROUP3_OP_TEST);
         m_formatter.immediate32(rhs);
