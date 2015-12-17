@@ -2688,6 +2688,21 @@ public:
 
     void movl_i32m(int32_t imm, int32_t offset, RegisterID base)
     {
+        if (shouldBlindConstant(imm))
+            movl_i32m_blnd(imm, offset, base);
+        else
+            movl_i32m_norm(imm, offset, base);
+    }
+
+    void movl_i32m_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        int bv = blindingValue();
+        movl_i32m_norm(imm ^ bv, offset, base);
+        xorl_im_norm(bv, offset, base);
+    }
+
+    void movl_i32m_norm(int32_t imm, int32_t offset, RegisterID base)
+    {
         spew("movl       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP11_EvIz, offset, base, GROUP11_MOV);
         m_formatter.immediate32(imm);
