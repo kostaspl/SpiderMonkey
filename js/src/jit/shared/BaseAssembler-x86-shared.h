@@ -1287,6 +1287,14 @@ public:
         m_formatter.immediate16(imm);
     }
 
+    /* Custom XOR for imm32. Not really tested */
+    void xorl_i32m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        spew("xorl       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
+        m_formatter.oneByteOp(OP_GROUP1_EvIz, offset, base, index, scale, GROUP1_OP_XOR);
+        m_formatter.immediate32(imm);
+    }
+
     /* Custom XOR for sign-extended 32imm as 64. Not really tested */
     void xorq_i32m(int32_t imm, int32_t offset, RegisterID base)
     {
@@ -2696,6 +2704,7 @@ public:
 
     void movl_i32m_blnd(int32_t imm, int32_t offset, RegisterID base)
     {
+        BLND_FUNC;
         int bv = blindingValue();
         movl_i32m_norm(imm ^ bv, offset, base);
         xorl_im_norm(bv, offset, base);
@@ -2717,6 +2726,22 @@ public:
     }
 
     void movl_i32m(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        if (shouldBlindConstant(imm))
+            movl_i32m_blnd(imm, offset, base, index, scale);
+        else
+            movl_i32m_norm(imm, offset, base, index, scale);
+    }
+
+    void movl_i32m_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movl_i32m_norm(imm ^ bv, offset, base, index, scale);
+        xorl_i32m(bv, offset, base, index, scale);
+    }
+
+    void movl_i32m_norm(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("movl       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP11_EvIz, offset, base, index, scale, GROUP11_MOV);
