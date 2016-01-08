@@ -703,6 +703,31 @@ public:
 
     void andl_ir(int32_t imm, RegisterID dst)
     {
+        if (shouldBlindConstant(imm))
+            andl_ir_blnd(imm, dst);
+        else
+            andl_ir_norm(imm, dst);
+    }
+
+    void andl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            andl_rr(blindingReg, dst);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            andl_rr(blindingReg, dst);
+        }
+    }
+
+    void andl_ir_norm(int32_t imm, RegisterID dst)
+    {
         spew("andl       $0x%x, %s", imm, GPReg32Name(dst));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_GROUP1_EvIb, dst, GROUP1_OP_AND);
@@ -1691,7 +1716,37 @@ public:
         m_formatter.oneByteOp(OP_CMP_GvEv, address, lhs);
     }
 
-    void cmpl_ir(int32_t rhs, RegisterID lhs)
+    void cmpl_ir(int32_t imm, RegisterID dst)
+    {
+        if (imm == 0) {
+            testl_rr(dst, dst);
+            return;
+        }
+
+	if (shouldBlindConstant(imm))
+            cmpl_ir_blnd(imm, dst);
+        else
+            cmpl_ir_norm(imm, dst);
+    }
+
+    void cmpl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            bv = blindingValue8();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpl_rr(blindingReg, dst);
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpl_rr(blindingReg, dst);
+        }
+    }
+
+    void cmpl_ir_norm(int32_t rhs, RegisterID lhs)
     {
         if (rhs == 0) {
             testl_rr(lhs, lhs);
@@ -1743,7 +1798,29 @@ public:
         m_formatter.immediate32(rhs);
     }
 
-    void cmpl_im(int32_t rhs, int32_t offset, RegisterID base)
+    void cmpl_im(int32_t imm, int32_t offset, RegisterID base)
+    {
+        if (shouldBlindConstant(imm))
+            cmpl_im_blnd(imm, offset, base);
+        else
+            cmpl_im_norm(imm, offset, base);
+    }
+
+    void cmpl_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpl_im_norm(imm, offset, base);    // TODO: is this ok?
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm^bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            cmpl_rm(blindingReg, offset, base);
+        }
+    }
+
+    void cmpl_im_norm(int32_t rhs, int32_t offset, RegisterID base)
     {
         spew("cmpl       $0x%x, " MEM_ob, rhs, ADDR_ob(offset, base));
         if (CAN_SIGN_EXTEND_8_32(rhs)) {
@@ -1962,7 +2039,34 @@ public:
         m_formatter.oneByteOp64(OP_CMP_GvEv, offset, base, lhs);
     }
 
-    void cmpq_ir(int32_t rhs, RegisterID lhs)
+    void cmpq_ir(int32_t imm, RegisterID dst)
+    {
+        if (imm == 0) {
+            testq_rr(dst, dst);
+            return;
+        }
+
+	if (shouldBlindConstant(imm))
+	    cmpq_ir_blnd(imm, dst);
+	else
+	    cmpq_ir_norm(imm, dst);
+    }
+
+    void cmpq_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            cmpq_ir_norm(imm, dst);     // TODO: is this ok?
+        } else {
+            bv = blindingValue();
+            movq_i32r_norm(imm^bv, blindingReg);
+            xorq_ir_norm(bv, blindingReg);
+            cmpq_rr(blindingReg, dst);
+        }
+    }
+
+    void cmpq_ir_norm(int32_t rhs, RegisterID lhs)
     {
         if (rhs == 0) {
             testq_rr(lhs, lhs);
@@ -2219,6 +2323,36 @@ public:
             testb_ir_norex(rhs >> 8, GetSubregH(lhs));
             return;
         }
+
+	if (shouldBlindConstant(rhs))
+	    testl_ir_blnd(rhs, lhs);
+	else
+	    testl_ir_norm(rhs, lhs);
+    }
+
+    void testl_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+	int bv = blindingValue();
+	movl_i32r_norm(imm^bv, blindingReg);
+	xorl_ir(bv, blindingReg);
+	testl_rr(blindingReg,  dst);
+    }
+
+    void testl_ir_norm(int32_t rhs, RegisterID lhs)
+    {
+        // If the mask fits in an 8-bit immediate, we can use testb with an
+        // 8-bit subreg.
+        if (CAN_ZERO_EXTEND_8_32(rhs) && HasSubregL(lhs)) {
+            testb_ir(rhs, lhs);
+            return;
+        }
+        // If the mask is a subset of 0xff00, we can use testb with an h reg, if
+        // one happens to be available.
+        if (CAN_ZERO_EXTEND_8H_32(rhs) && HasSubregH(lhs)) {
+            testb_ir_norex(rhs >> 8, GetSubregH(lhs));
+            return;
+        }
         spew("testl      $0x%x, %s", rhs, GPReg32Name(lhs));
         if (lhs == rax)
             m_formatter.oneByteOp(OP_TEST_EAXIv);
@@ -2252,6 +2386,23 @@ public:
     }
 
     void testl_i32m(int32_t rhs, int32_t offset, RegisterID base)
+    {
+        if (shouldBlindConstant(rhs))
+            testl_i32m_blnd(rhs, offset, base);
+        else
+            testl_i32m_norm(rhs, offset, base);
+    }
+
+    void testl_i32m_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movl_i32r_norm(imm^bv, blindingReg);
+        xorl_ir_norm(bv, blindingReg);
+        testl_rm(blindingReg, offset, base);
+    }
+
+    void testl_i32m_norm(int32_t rhs, int32_t offset, RegisterID base)
     {
         spew("testl      $0x%x, " MEM_ob, rhs, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP3_EvIz, offset, base, GROUP3_OP_TEST);

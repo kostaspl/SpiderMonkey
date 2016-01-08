@@ -673,6 +673,8 @@ CallAsmJS(JSContext* cx, unsigned argc, Value* vp)
     AsmJSModule& module = FunctionToEnclosingModule(callee);
     const AsmJSModule::ExportedFunction& func = FunctionToExportedFunction(callee, module);
 
+    puts("");
+
     // The heap-changing function is a special-case and is implemented by C++.
     if (func.isChangeHeap())
         return ChangeHeap(cx, module, callArgs);
@@ -695,6 +697,8 @@ CallAsmJS(JSContext* cx, unsigned argc, Value* vp)
     js::Vector<AsmJSModule::EntryArg, 8> coercedArgs(cx);
     if (!coercedArgs.resize(Max<size_t>(1, func.numArgs())))
         return false;
+
+    puts("");
 
     RootedValue v(cx);
     for (unsigned i = 0; i < func.numArgs(); ++i) {
@@ -729,6 +733,8 @@ CallAsmJS(JSContext* cx, unsigned argc, Value* vp)
         }
     }
 
+    //printf("3 - func = %p !!!\n", &func);
+
     // The correct way to handle this situation would be to allocate a new range
     // of PROT_NONE memory and module.changeHeap to this memory. That would
     // cause every access to take the out-of-bounds signal-handler path which
@@ -740,6 +746,8 @@ CallAsmJS(JSContext* cx, unsigned argc, Value* vp)
         return false;
     }
 
+    //printf("4 - func = %p !!!\n", &func);
+
     {
         // Push an AsmJSActivation to describe the asm.js frames we're about to
         // push when running this module. Additionally, push a JitActivation so
@@ -749,11 +757,21 @@ CallAsmJS(JSContext* cx, unsigned argc, Value* vp)
         AsmJSActivation activation(cx, module);
         JitActivation jitActivation(cx, /* active */ false);
 
+        //printf("4.1 - func = %p !!!\n", &func);
+
         // Call the per-exported-function trampoline created by GenerateEntry.
         AsmJSModule::CodePtr enter = module.entryTrampoline(func);
+
+        //printf("4.2 - func = %p !!!\n", &func);
+
+        // TODO: this is where "func" gets corrupted and we get SEGFAULT
         if (!CALL_GENERATED_ASMJS(enter, coercedArgs.begin(), module.globalData()))
             return false;
+
+        //printf("4.3 - func = %p !!!\n", &func);
     }
+
+    //printf("5 - func = %p !!!\n", &func);
 
     if (callArgs.isConstructing()) {
         // By spec, when a function is called as a constructor and this function
@@ -764,6 +782,8 @@ CallAsmJS(JSContext* cx, unsigned argc, Value* vp)
         callArgs.rval().set(ObjectValue(*obj));
         return true;
     }
+
+    //printf("after - func = %p !!!\n", &func);
 
     JSObject* simdObj;
     switch (func.returnType()) {
