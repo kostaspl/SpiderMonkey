@@ -2526,6 +2526,30 @@ public:
             testl_ir(rhs, lhs);
             return;
         }
+
+	if (shouldBlindConstant(rhs))
+	    testq_ir_blnd(rhs, lhs);
+	else
+	    testq_ir_norm(rhs, lhs);
+    }
+
+    void testq_ir_blnd(int32_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+	int bv = blindingValue();
+	movq_i32r_norm(imm^bv, blindingReg);
+	xorq_ir(bv, blindingReg);
+	testq_rr(blindingReg,  dst);
+    }
+
+    void testq_ir_norm(int32_t rhs, RegisterID lhs)
+    {
+        // If the mask fits in a 32-bit immediate, we can use testl with a
+        // 32-bit subreg.
+        if (CAN_ZERO_EXTEND_32_64(rhs)) {
+            testl_ir(rhs, lhs);
+            return;
+        }
         spew("testq      $0x%" PRIx64 ", %s", int64_t(rhs), GPReg64Name(lhs));
         if (lhs == rax)
             m_formatter.oneByteOp64(OP_TEST_EAXIv);
