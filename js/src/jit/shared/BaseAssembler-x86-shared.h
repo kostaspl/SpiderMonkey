@@ -1362,7 +1362,7 @@ public:
     /* Custom XOR for 64-bit imm. Not really tested */
     void xorq_i64r(int64_t imm, RegisterID dst)
     {
-        spew("xorq_i64r       $0x%llx, %s",
+        spew("xorq64       $0x%llx, %s",
                 (unsigned long long int)imm, GPReg64Name(dst));
         m_formatter.oneByteOp64(OP_GROUP1_EvIz, dst, GROUP1_OP_XOR);
         m_formatter.immediate64(imm);
@@ -2396,6 +2396,13 @@ public:
         m_formatter.oneByteOp(OP_TEST_EvGv, offset, base, index, scale, src);
     }
 
+    /* Custom testl_rm, not sure if right */
+    void testl_rm(RegisterID src, const void* addr)
+    {
+        spew("testl       %s, %p", GPReg32Name(src), addr);
+        m_formatter.oneByteOp(OP_TEST_EvGv, addr, src);
+    }
+
     void testb_rm(RegisterID src, int32_t offset, RegisterID base)
     {
         spew("testb       %s, " MEM_ob, GPReg8Name(src), ADDR_ob(offset, base));
@@ -2877,6 +2884,22 @@ public:
     }
 
     void movw_im(int32_t imm, int32_t offset, RegisterID base)
+    {
+    	if (shouldBlindConstant(imm))
+            movw_im_blnd(imm, offset, base);
+    	else
+            movw_im_norm(imm, offset, base);
+    }
+
+    void movw_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        BLND_FUNC;
+    	int bv = blindingValue16();
+    	movw_im_norm(imm ^ bv, offset, base);
+    	xorw_i16m(bv, offset, base);
+    }
+
+    void movw_im_norm(int32_t imm, int32_t offset, RegisterID base)
     {
         spew("movw       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         m_formatter.prefix(PRE_OPERAND_SIZE);
