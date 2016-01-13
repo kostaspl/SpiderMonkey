@@ -2940,6 +2940,22 @@ public:
 
     void movw_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
+        if (shouldBlindConstant(imm))
+            movw_im_blnd(imm, offset, base, index, scale);
+        else
+            movw_im_norm(imm, offset, base, index, scale);
+    }
+
+    void movw_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv = blindingValue16();
+        movw_im_norm(imm ^ bv, offset, base, index, scale);
+        xorw_i16m(bv, offset, base, index, scale);
+    }
+
+    void movw_im_norm(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
         spew("movw       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
         m_formatter.prefix(PRE_OPERAND_SIZE);
         m_formatter.oneByteOp(OP_GROUP11_EvIz, offset, base, index, scale, GROUP11_MOV);
