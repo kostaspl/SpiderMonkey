@@ -2909,6 +2909,22 @@ public:
 
     void movw_im(int32_t imm, const void* addr)
     {
+        if (shouldBlindConstant(imm))
+            movw_im_blnd(imm, addr);
+        else
+            movw_im_norm(imm, addr);
+    }
+
+    void movw_im_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+        int bv = blindingValue16();
+        movw_im_norm(imm-bv, addr);
+        addq_im_norm(bv, addr);         // TODO: addq?
+    }
+
+    void movw_im_norm(int32_t imm, const void* addr)
+    {
         spew("movw       $%d, %p", imm, addr);
         m_formatter.prefix(PRE_OPERAND_SIZE);
         m_formatter.oneByteOp_disp32(OP_GROUP11_EvIz, addr, GROUP11_MOV);
