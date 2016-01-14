@@ -2887,6 +2887,22 @@ public:
 
     void movb_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
+        if (shouldBlindConstant(imm))
+            movb_im_blnd(imm, offset, base, index, scale);
+        else
+            movb_im_norm(imm, offset, base, index, scale);
+    }
+
+    void movb_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
+        BLND_FUNC;
+        int bv = blindingValue8();
+        movb_im_norm(imm ^ bv, offset, base, index, scale);
+        xorb_i8m(bv, offset, base, index, scale);
+    }
+
+    void movb_im_norm(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
+    {
         spew("movb       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP11_EvIb, offset, base, index, scale, GROUP11_MOV);
         m_formatter.immediate8(imm);
