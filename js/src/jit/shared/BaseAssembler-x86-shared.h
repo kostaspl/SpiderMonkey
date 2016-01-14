@@ -89,7 +89,7 @@ public:
 
     /* Constant blinding version Full */
     bool shouldBlindConstant(int32_t imm) {
-        return true;
+        return imm != 0;
     }
 
     /* Constant blinding version Byte2
@@ -2863,6 +2863,22 @@ public:
     }
 
     void movb_im(int32_t imm, int32_t offset, RegisterID base)
+    {
+        if (shouldBlindConstant(imm))
+            movb_im_blnd(imm, offset, base);
+        else
+            movb_im_norm(imm, offset, base);
+    }
+
+    void movb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
+    {
+        BLND_FUNC;
+        int32_t bv = blindingValue8();
+        movb_im_norm(imm ^ bv, offset, base);
+        xorb_i8m(bv, offset, base);
+    }
+
+    void movb_im_norm(int32_t imm, int32_t offset, RegisterID base)
     {
         spew("movb       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP11_EvIb, offset, base, GROUP11_MOV);
