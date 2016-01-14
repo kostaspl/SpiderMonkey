@@ -2910,6 +2910,22 @@ public:
 
     void movb_im(int32_t imm, const void* addr)
     {
+	if (shouldBlindConstant(imm))
+	    movb_im_blnd(imm, addr);
+	else
+	    movb_im_norm(imm, addr);
+    }
+
+    void movb_im_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+	int bv = blindingValue8();
+	movb_im_norm(imm-bv, addr);
+	addl_im_norm(bv, addr);         // TODO: addl?
+    }
+
+    void movb_im_norm(int32_t imm, const void* addr)
+    {
         spew("movb       $%d, %p", imm, addr);
         m_formatter.oneByteOp_disp32(OP_GROUP11_EvIb, addr, GROUP11_MOV);
         m_formatter.immediate8(imm);
