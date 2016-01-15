@@ -2363,7 +2363,7 @@ public:
         BLND_FUNC;
 	int bv = blindingValue();
 	movl_i32r_norm(imm^bv, blindingReg);
-	xorl_ir(bv, blindingReg);
+	xorl_ir_norm(bv, blindingReg);
 	testl_rr(blindingReg,  dst);
     }
 
@@ -2444,7 +2444,24 @@ public:
         m_formatter.immediate32(rhs);
     }
 
-    void testl_i32m(int32_t rhs, const void* addr)
+    void testl_i32m(int32_t imm, const void* addr)
+    {
+	if (shouldBlindConstant(imm))
+	    testl_i32m_blnd(imm, addr);
+	else
+	    testl_i32m_norm(imm, addr);
+    }
+
+    void testl_i32m_blnd(int32_t imm, const void* addr)
+    {
+        BLND_FUNC;
+	int bv = blindingValue();
+        movl_i32r_norm(imm^bv, blindingReg);
+        xorl_ir_norm(bv, blindingReg);
+        testl_rm(blindingReg, addr);
+    }
+
+    void testl_i32m_norm(int32_t rhs, const void* addr)
     {
         spew("testl      $0x%x, %p", rhs, addr);
         m_formatter.oneByteOp(OP_GROUP3_EvIz, addr, GROUP3_OP_TEST);
@@ -2550,7 +2567,7 @@ public:
         BLND_FUNC;
 	int bv = blindingValue();
 	movq_i32r_norm(imm^bv, blindingReg);
-	xorq_ir(bv, blindingReg);
+	xorq_ir_norm(bv, blindingReg);
 	testq_rr(blindingReg,  dst);
     }
 
