@@ -970,6 +970,7 @@ public:
         }
     }
 
+
     void orl_im(int32_t imm, int32_t offset, RegisterID base)
     {
         if (shouldBlindConstant(imm))
@@ -1059,6 +1060,7 @@ public:
         m_formatter.oneByteOp64(OP_GROUP3_Ev, dst, GROUP3_OP_NOT);
     }
 #else
+/*
     void orl_im(int32_t imm, const void* addr)
     {
         if (shouldBlindConstant(imm))
@@ -1084,12 +1086,6 @@ public:
         }
     }
 
-    void orl_rm(RegisterID src, const void* addr)
-    {
-        spew("orl        %s, " MEM_ob, GPReg32Name(src), addr);
-        m_formatter.oneByteOp(OP_OR_EvGv, addr, src);
-    }
-
     void orl_im_norm(int32_t imm, const void* addr)
     {
         spew("orl        $0x%x, %p", imm, addr);
@@ -1101,6 +1097,13 @@ public:
             m_formatter.immediate32(imm);
         }
     }
+
+    void orl_rm(RegisterID src, const void* addr)
+    {
+        spew("orl        %s, " MEM_ob, GPReg32Name(src), addr);
+        m_formatter.oneByteOp(OP_OR_EvGv, addr, src);
+    }
+*/
 #endif
 
     void subl_rr(RegisterID src, RegisterID dst)
@@ -1961,6 +1964,7 @@ public:
         }
     }
 
+    /*
     MOZ_WARN_UNUSED_RESULT JmpSrc
     cmpl_im_disp32(int32_t rhs, int32_t offset, RegisterID base)
     {
@@ -1977,7 +1981,7 @@ public:
         }
         return r;
     }
-
+    
     MOZ_WARN_UNUSED_RESULT JmpSrc
     cmpl_im_disp32(int32_t rhs, const void* addr)
     {
@@ -1994,6 +1998,7 @@ public:
         }
         return r;
     }
+    */
 
     void cmpl_i32m(int32_t rhs, int32_t offset, RegisterID base)
     {
