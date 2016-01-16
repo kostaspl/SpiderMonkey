@@ -1673,6 +1673,29 @@ public:
 
     void imull_ir(int32_t value, RegisterID src, RegisterID dst)
     {
+        if (shouldBlindConstant(value)){
+            imull_ir_blnd(value, src, dst);
+        } else {
+            imull_ir_norm(value, src, dst);
+        }
+    }
+
+    void imull_ir_blnd(int32_t value, RegisterID src, RegisterID dst)
+    {
+        BLND_FUNC;
+        if (CAN_SIGN_EXTEND_8_32(value)) {
+            imull_ir_norm(value, src, dst);     // TODO: is this ok?
+        } else {
+            int bv = 2;                         // TODO: FIX THIS!!!
+            movl_rr(src, blindingReg);          // store src's value in blindingReg, as sometimes src == dst
+            imull_ir_norm(value + bv, src, dst);
+            imull_ir_norm(bv, blindingReg, blindingReg);
+            subl_rr(blindingReg, dst);
+        }
+    }
+
+    void imull_ir_norm(int32_t value, RegisterID src, RegisterID dst)
+    {
         spew("imull      $%d, %s, %s", value, GPReg32Name(src), GPReg32Name(dst));
         if (CAN_SIGN_EXTEND_8_32(value)) {
             m_formatter.oneByteOp(OP_IMUL_GvEvIb, src, dst);
