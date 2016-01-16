@@ -192,6 +192,29 @@ public:
 
     void push_i(int32_t imm)
     {
+        if (shouldBlindConstant(imm)){
+            push_i_blnd(imm);
+        } else {
+            push_i_norm(imm);
+        }
+    }
+
+    void push_i_blnd(int32_t imm)
+    {
+        BLND_FUNC;
+        int bv;
+        if (CAN_SIGN_EXTEND_8_32(imm)) {
+            push_i_norm(imm);   // TODO: is this ok?
+        } else {
+            bv = blindingValue();
+            movl_i32r_norm(imm ^ bv, blindingReg);
+            xorl_ir_norm(bv, blindingReg);
+            push_r(blindingReg);
+        }
+    }
+
+    void push_i_norm(int32_t imm)
+    {
         spew("push       $%s0x%x", PRETTYHEX(imm));
         if (CAN_SIGN_EXTEND_8_32(imm)) {
             m_formatter.oneByteOp(OP_PUSH_Ib);
@@ -203,6 +226,24 @@ public:
     }
 
     void push_i32(int32_t imm)
+    {
+        if (shouldBlindConstant(imm)){
+            push_i32_blnd(imm);
+        } else {
+            push_i32_norm(imm);
+        }
+    }
+
+    void push_i32_blnd(int32_t imm)
+    {
+        BLND_FUNC;
+        int bv = blindingValue();
+        movl_i32r_norm(imm ^ bv, blindingReg);
+        xorl_ir_norm(bv, blindingReg);
+        push_r(blindingReg);
+    }
+
+    void push_i32_norm(int32_t imm)
     {
         spew("push       $%s0x%04x", PRETTYHEX(imm));
         m_formatter.oneByteOp(OP_PUSH_Iz);
