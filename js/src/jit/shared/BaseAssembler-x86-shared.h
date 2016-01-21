@@ -135,30 +135,30 @@ public:
 
     inline int32_t blindingValue()
     {
-        if (blinding_value)
-	    return blinding_value;
+        //if (blinding_value)
+	//    return blinding_value;
         return blinding_value = constantBlindingRand();
     }
 
     inline int8_t blindingValue8()
     {
-        if (blinding_value8)
-            return blinding_value8;
+        //if (blinding_value8)
+        //    return blinding_value8;
         return blinding_value8 = constantBlindingRand8();
     }
 
     inline int16_t blindingValue16()
     {
-        if (blinding_value16)
-            return blinding_value16;
+        //if (blinding_value16)
+        //    return blinding_value16;
         blinding_value16 = constantBlindingRand16();
         return blinding_value16;
     }
 
     inline int64_t blindingValue64()
     {
-        if (blinding_value64)
-            return blinding_value64;
+        //if (blinding_value64)
+        //    return blinding_value64;
         blinding_value64 = constantBlindingRand64();
         return blinding_value64;
     }
@@ -1406,8 +1406,7 @@ public:
     /* Custom XOR for 64-bit imm. Not really tested */
     void xorq_i64r(int64_t imm, RegisterID dst)
     {
-        spew("xorq64       $0x%llx, %s",
-                (unsigned long long int)imm, GPReg64Name(dst));
+        spew("xorq64       $0x%" PRIx64 ", %s", imm, GPReg64Name(dst));
         m_formatter.oneByteOp64(OP_GROUP1_EvIz, dst, GROUP1_OP_XOR);
         m_formatter.immediate64(imm);
     }
@@ -3396,7 +3395,23 @@ public:
         m_formatter.immediate32(imm);
     }
 
-    void movq_i64r(int64_t imm, RegisterID dst)
+    void movq_i64r(int64_t imm, RegisterID dst) {
+        if (shouldBlindConstant(imm))
+            movq_i64r_blnd(imm, dst);
+        else
+            movq_i64r_norm(imm, dst);
+    }
+
+    void movq_i64r_blnd(int64_t imm, RegisterID dst)
+    {
+        BLND_FUNC;
+        int64_t bv = blindingValue64();
+        movq_i64r_norm(imm^bv, dst);
+        movq_i64r_norm(bv, blindingReg);
+        xorq_rr(blindingReg, dst);
+    }
+
+    void movq_i64r_norm(int64_t imm, RegisterID dst)
     {
         spew("movabsq    $0x%" PRIx64 ", %s", imm, GPReg64Name(dst));
         m_formatter.oneByteOp64(OP_MOV_EAXIv, dst);

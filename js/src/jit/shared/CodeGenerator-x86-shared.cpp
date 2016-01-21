@@ -2034,7 +2034,7 @@ CodeGeneratorX86Shared::generateInvalidateEpilogue()
     masm.bind(&invalidate_);
 
     // Push the Ion script onto the stack (when we determine what that pointer is).
-    invalidateEpilogueData_ = masm.pushWithPatch(ImmWord(uintptr_t(-1)));
+    invalidateEpilogueData_ = masm.pushWithPatch_norm(ImmWord(uintptr_t(-1)));
     JitCode* thunk = gen->jitRuntime()->getInvalidationThunk();
 
     masm.call(thunk);

@@ -851,7 +851,7 @@ class MacroAssembler : public MacroAssemblerSpecific
 
   public:
     void PushStubCode() {
-        exitCodePatch_ = PushWithPatch(ImmWord(-1));
+        exitCodePatch_ = PushWithPatch_norm(ImmWord(-1));
     }
 
     void enterExitFrame(const VMFunction* f = nullptr) {

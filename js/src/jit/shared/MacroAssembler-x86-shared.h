@@ -570,8 +570,12 @@ class MacroAssemblerX86Shared : public Assembler
         framePushed_ += sizeof(word.value);
         return pushWithPatch(word);
     }
+    CodeOffsetLabel PushWithPatch_norm(ImmWord word) {
+        framePushed_ += sizeof(word.value);
+        return pushWithPatch_norm(word);
+    }
     CodeOffsetLabel PushWithPatch(ImmPtr imm) {
-        return PushWithPatch(ImmWord(uintptr_t(imm.value)));
+        return PushWithPatch_norm(ImmWord(uintptr_t(imm.value)));
     }
 
     template <typename T>

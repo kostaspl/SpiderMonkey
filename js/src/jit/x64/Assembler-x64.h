@@ -306,6 +306,12 @@ class Assembler : public AssemblerX86Shared
         return label;
     }
 
+    CodeOffsetLabel pushWithPatch_norm(ImmWord word) {
+        CodeOffsetLabel label = movWithPatch_norm(word, ScratchReg);
+        push(ScratchReg);
+        return label;
+    }
+
     void pop(FloatRegister src) {
         vmovsd(Address(StackPointer, 0), src);
         addq(Imm32(sizeof(double)), StackPointer);
@@ -315,8 +321,15 @@ class Assembler : public AssemblerX86Shared
         masm.movq_i64r(word.value, dest.code());
         return CodeOffsetLabel(masm.currentOffset());
     }
+
+    CodeOffsetLabel movWithPatch_norm(ImmWord word, Register dest) {
+        masm.movq_i64r_norm(word.value, dest.code());
+        return CodeOffsetLabel(masm.currentOffset());
+    }
+
     CodeOffsetLabel movWithPatch(ImmPtr imm, Register dest) {
-        return movWithPatch(ImmWord(uintptr_t(imm.value)), dest);
+        return movWithPatch_norm(ImmWord(uintptr_t(imm.value)), dest);
+
     }
 
     // Load an ImmWord value into a register. Note that this instruction will
@@ -341,7 +354,7 @@ class Assembler : public AssemblerX86Shared
         movq(ImmWord(uintptr_t(imm.value)), dest);
     }
     void movq(ImmGCPtr ptr, Register dest) {
-        masm.movq_i64r(uintptr_t(ptr.value), dest.code());
+        masm.movq_i64r_norm(uintptr_t(ptr.value), dest.code());
         writeDataRelocation(ptr);
     }
     void movq(const Operand& src, Register dest) {
@@ -575,7 +588,7 @@ class Assembler : public AssemblerX86Shared
         movq(imm, dest);
     }
     void mov(AsmJSImmPtr imm, Register dest) {
-        masm.movq_i64r(-1, dest.code());
+        masm.movq_i64r_norm(-1, dest.code());
         append(AsmJSAbsoluteLink(CodeOffsetLabel(masm.currentOffset()), imm.kind()));
     }
     void mov(const Operand& src, Register dest) {
@@ -594,7 +607,7 @@ class Assembler : public AssemblerX86Shared
         MOZ_ASSERT(!label->bound());
         // Thread the patch list through the unpatched address word in the
         // instruction stream.
-        masm.movq_i64r(label->prev(), dest.code());
+        masm.movq_i64r_norm(label->prev(), dest.code());
         label->setPrev(masm.size());
     }
     void xchg(Register src, Register dest) {
