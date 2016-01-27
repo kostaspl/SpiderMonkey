@@ -321,9 +321,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            addl_ir_norm(imm - bv, dst);
-            addl_ir_norm(bv, dst);
+            addl_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             addl_ir_norm(imm - bv, dst);
@@ -386,9 +384,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            addl_im_norm(imm - bv, offset, base);
-            addl_im_norm(bv, offset, base);
+            addl_im_norm(imm, offset, base);
         } else {
             bv = blindingValue();
             addl_im_norm(imm - bv, offset, base);
@@ -440,9 +436,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            addq_ir_norm(imm - bv, dst);
-            addq_ir_norm(bv, dst);
+            addq_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             addq_ir_norm(imm - bv, dst);
@@ -478,9 +472,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            addq_im_norm(imm - bv, offset, base);
-            addq_im_norm(bv, offset, base);
+            addq_im_norm(imm, offset, base);
         } else {
             bv = blindingValue();
             addq_im_norm(imm - bv, offset, base);
@@ -513,9 +505,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            addq_im_norm(imm - bv, addr);
-            addq_im_norm(bv, addr);
+            addq_im_norm(imm, addr);
         } else {
             bv = blindingValue();
             addq_im_norm(imm - bv, addr);
@@ -548,9 +538,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            addl_im_norm(imm - bv, addr);
-            addl_im_norm(bv, addr);
+            addl_im_norm(imm, addr);
         } else {
             bv = blindingValue();
             addl_im_norm(imm - bv, addr);
@@ -755,10 +743,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movl_i32r_norm(imm^bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            andl_rr(blindingReg, dst);
+            andl_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm^bv, blindingReg);
@@ -795,10 +780,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movl_i32r_norm(imm^bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            andl_rm(blindingReg, offset, base);
+            andl_im_norm(imm, offset, base);
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm^bv, blindingReg);
@@ -1178,9 +1160,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            subl_ir_norm(imm - bv, dst);
-            subl_ir_norm(bv, dst);
+            subl_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             subl_ir_norm(imm - bv, dst);
@@ -1216,9 +1196,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            subl_im_norm(imm-bv, offset, base);
-            subl_im_norm(bv, offset, base);
+            subl_im_norm(imm, offset, base);
         } else {
             bv = blindingValue();
             subl_im_norm(imm-bv, offset, base);
@@ -1276,9 +1254,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            subq_ir_norm(imm-bv, dst);
-            subq_ir_norm(bv, dst);
+            subq_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             subq_ir_norm(imm-bv, dst);
@@ -1314,9 +1290,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            subl_im_norm(imm - bv, addr);
-            subl_im_norm(bv, addr);
+            subl_im_norm(imm, addr);
         } else {
             bv = blindingValue();
             subl_im_norm(imm - bv, addr);
@@ -1442,9 +1416,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            xorl_im_norm(imm ^ bv, offset, base);
-            xorl_im_norm(bv, offset, base);
+            xorl_im_norm(imm, offset, base);
         } else {
             bv = blindingValue();
             xorl_im_norm(imm ^ bv, offset, base);
@@ -1477,9 +1449,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            xorl_ir_norm(imm ^ bv, dst);
-            xorl_ir_norm(bv, dst);
+            xorl_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             xorl_ir_norm(imm ^ bv, dst);
@@ -1522,9 +1492,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            xorq_ir_norm(imm ^ bv, dst);
-            xorq_ir_norm(bv, dst);
+            xorq_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             xorq_ir_norm(imm ^ bv, dst);
@@ -1823,10 +1791,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movl_i32r_norm(imm^bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            cmpl_rr(blindingReg, dst);
+            cmpl_ir_norm(imm, dst);
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm^bv, blindingReg);
@@ -1939,46 +1904,12 @@ public:
 
     void cmpb_im(int32_t rhs, int32_t offset, RegisterID base)
     {
-	if (shouldBlindConstant(rhs))
-	    cmpb_im_blnd(rhs, offset, base);
-	else
-	    cmpb_im_norm(rhs, offset, base);
-    }
-
-    void cmpb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
-    {
-        BLND_FUNC;
-	int bv = blindingValue8();
-	movb_ir_norm(imm ^ bv, blindingReg);
-	xorb_i8r(bv, blindingReg);
-	cmpb_rm(blindingReg, offset, base);
-    }
-
-    void cmpb_im_norm(int32_t rhs, int32_t offset, RegisterID base)
-    {
         spew("cmpb       $0x%x, " MEM_ob, rhs, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP1_EbIb, offset, base, GROUP1_OP_CMP);
         m_formatter.immediate8(rhs);
     }
 
     void cmpb_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
-    {
-	if (shouldBlindConstant(rhs))
-	    cmpb_im_blnd(rhs, offset, base, index, scale);
-	else
-	    cmpb_im_norm(rhs, offset, base, index, scale);
-    }
-
-    void cmpb_im_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
-    {
-        BLND_FUNC;
-        int bv = blindingValue8();
-        movb_ir_norm(rhs ^ bv, blindingReg);
-        xorb_i8r(bv, blindingReg);
-        cmpb_rm(blindingReg, offset, base, index, scale);
-    }
-
-    void cmpb_im_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("cmpb       $0x%x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP1_EbIb, offset, base, index, scale, GROUP1_OP_CMP);
@@ -2224,7 +2155,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            cmpq_im_norm(imm, offset, base); // TODO: is this ok?
+            cmpq_im_norm(imm, offset, base, index, scale); // TODO: is this ok?
         } else {
             bv = blindingValue();
             movq_i32r_norm(imm ^ bv, blindingReg);
@@ -2362,10 +2293,7 @@ public:
         BLND_FUNC;
         int bv;
         if (CAN_SIGN_EXTEND_8_32(imm)) {
-            bv = blindingValue8();
-            movl_i32r_norm(imm ^ bv, blindingReg);
-            xorl_ir_norm(bv, blindingReg);
-            cmpw_rm(blindingReg, offset, base, index, scale);
+            cmpw_im_norm(imm, offset, base, index, scale);
         } else {
             bv = blindingValue();
             movl_i32r_norm(imm ^ bv, blindingReg);
@@ -2533,46 +2461,12 @@ public:
 
     void testb_im(int32_t rhs, int32_t offset, RegisterID base)
     {
-	if (shouldBlindConstant(rhs))
-	    testb_im_blnd(rhs, offset, base);
-	else
-	    testb_im_norm(rhs, offset, base);
-    }
-
-    void testb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
-    {
-        BLND_FUNC;
-	int bv = blindingValue8();
-	movb_ir_norm(imm ^ bv, blindingReg);
-	xorb_i8r(bv, blindingReg);
-	testb_rm(blindingReg, offset, base);
-    }
-
-    void testb_im_norm(int32_t rhs, int32_t offset, RegisterID base)
-    {
         spew("testb      $0x%x, " MEM_ob, rhs, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP3_EbIb, offset, base, GROUP3_OP_TEST);
         m_formatter.immediate8(rhs);
     }
 
     void testb_im(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
-    {
-	if (shouldBlindConstant(rhs))
-	    testb_im_blnd(rhs, offset, base, index, scale);
-	else
-	    testb_im_norm(rhs, offset, base, index, scale);
-    }
-
-    void testb_im_blnd(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
-    {
-        BLND_FUNC;
-	int bv = blindingValue8();
-	movb_ir_norm(rhs ^ bv, blindingReg);
-	xorb_i8r(bv, blindingReg);
-	testb_rm(blindingReg, offset, base, index, scale);
-    }
-
-    void testb_im_norm(int32_t rhs, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
         spew("testb      $0x%x, " MEM_obs, rhs, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP3_EbIb, offset, base, index, scale, GROUP3_OP_TEST);
@@ -2924,23 +2818,7 @@ public:
         m_formatter.immediate32(imm);
     }
 
-    void movb_ir(int32_t imm, RegisterID dst)
-    {
-	if (shouldBlindConstant(imm))
-	    movb_ir_blnd(imm, dst);
-	else
-	    movb_ir_norm(imm, dst);
-    }
-
-    void movb_ir_blnd(int32_t imm, RegisterID dst)
-    {
-        BLND_FUNC;
-	int bv = blindingValue8();
-	movb_ir_norm(imm ^ bv, dst);
-	xorb_i8r(bv, dst);
-    }
-
-    void movb_ir_norm(int32_t imm, RegisterID reg)
+    void movb_ir(int32_t imm, RegisterID reg)
     {
         spew("movb       $0x%x, %s", imm, GPReg8Name(reg));
         m_formatter.oneByteOp(OP_MOV_EbGv, reg);
@@ -2949,22 +2827,6 @@ public:
 
     void movb_im(int32_t imm, int32_t offset, RegisterID base)
     {
-        if (shouldBlindConstant(imm))
-            movb_im_blnd(imm, offset, base);
-        else
-            movb_im_norm(imm, offset, base);
-    }
-
-    void movb_im_blnd(int32_t imm, int32_t offset, RegisterID base)
-    {
-        BLND_FUNC;
-        int32_t bv = blindingValue8();
-        movb_im_norm(imm ^ bv, offset, base);
-        xorb_i8m(bv, offset, base);
-    }
-
-    void movb_im_norm(int32_t imm, int32_t offset, RegisterID base)
-    {
         spew("movb       $0x%x, " MEM_ob, imm, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP11_EvIb, offset, base, GROUP11_MOV);
         m_formatter.immediate8(imm);
@@ -2972,44 +2834,12 @@ public:
 
     void movb_im(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
     {
-        if (shouldBlindConstant(imm))
-            movb_im_blnd(imm, offset, base, index, scale);
-        else
-            movb_im_norm(imm, offset, base, index, scale);
-    }
-
-    void movb_im_blnd(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
-    {
-        BLND_FUNC;
-        int bv = blindingValue8();
-        movb_im_norm(imm ^ bv, offset, base, index, scale);
-        xorb_i8m(bv, offset, base, index, scale);
-    }
-
-    void movb_im_norm(int32_t imm, int32_t offset, RegisterID base, RegisterID index, int scale)
-    {
         spew("movb       $0x%x, " MEM_obs, imm, ADDR_obs(offset, base, index, scale));
         m_formatter.oneByteOp(OP_GROUP11_EvIb, offset, base, index, scale, GROUP11_MOV);
         m_formatter.immediate8(imm);
     }
 
     void movb_im(int32_t imm, const void* addr)
-    {
-	if (shouldBlindConstant(imm))
-	    movb_im_blnd(imm, addr);
-	else
-	    movb_im_norm(imm, addr);
-    }
-
-    void movb_im_blnd(int32_t imm, const void* addr)
-    {
-        BLND_FUNC;
-	int bv = blindingValue8();
-	movb_im_norm(imm-bv, addr);
-	addl_im_norm(bv, addr);         // TODO: addl?
-    }
-
-    void movb_im_norm(int32_t imm, const void* addr)
     {
         spew("movb       $%d, %p", imm, addr);
         m_formatter.oneByteOp_disp32(OP_GROUP11_EvIb, addr, GROUP11_MOV);
