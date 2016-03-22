@@ -2288,7 +2288,7 @@ MacroAssembler::profilerPreCallImpl(Register reg, Register reg2)
     JitContext* icx = GetJitContext();
     AbsoluteAddress profilingActivation(icx->runtime->addressOfProfilingActivation());
 
-    CodeOffsetLabel label = movWithPatch_norm(ImmWord(uintptr_t(-1)), reg);
+    CodeOffsetLabel label = movWithPatch(ImmWord(uintptr_t(-1)), reg);
     loadPtr(profilingActivation, reg2);
     storePtr(reg, Address(reg2, JitActivation::offsetOfLastProfilingCallSite()));
 

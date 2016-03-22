@@ -1641,7 +1641,7 @@ CodeGeneratorShared::emitTracelogScript(bool isStart)
 
     masm.Push(script);
 
-    CodeOffsetLabel patchScript = masm.movWithPatch_norm(ImmWord(0), script);
+    CodeOffsetLabel patchScript = masm.movWithPatch(ImmWord(0), script);
     masm.propagateOOM(patchableTLScripts_.append(patchScript));
 
     if (isStart)

@@ -34,7 +34,7 @@ inline void
 EmitCallIC(CodeOffsetLabel* patchOffset, MacroAssembler& masm)
 {
     // Move ICEntry offset into BaselineStubReg
-    CodeOffsetLabel offset = masm.movWithPatch_norm(ImmWord(-1), BaselineStubReg);
+    CodeOffsetLabel offset = masm.movWithPatch(ImmWord(-1), BaselineStubReg);
     *patchOffset = offset;
 
     // Load stub pointer into BaselineStubReg
