@@ -3227,7 +3227,7 @@ public:
 
     void movq_i64r(int64_t imm, RegisterID dst) {
         if (shouldBlindConstant(imm))
-            movq_i64r_blnd(imm, dst);
+            movq_i64r_norm(imm, dst);
         else
             movq_i64r_norm(imm, dst);
     }

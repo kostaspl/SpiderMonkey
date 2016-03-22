@@ -477,10 +477,12 @@ MacroAssemblerX64::storeUnboxedValue(ConstantOrRegister value, MIRType valueType
     if ((valueType == MIRType_Int32 || valueType == MIRType_Boolean) && slotType == valueType) {
         if (value.constant()) {
             Value val = value.value();
-            if (valueType == MIRType_Int32)
+            if (valueType == MIRType_Int32){
                 store32(Imm32(val.toInt32()), dest);
-            else
+                printf("storeUnboxedValue - Imm32(%d) - 0x%x\n", val.toInt32(), val.toInt32());
+            } else {
                 store32(Imm32(val.toBoolean() ? 1 : 0), dest);
+            }
         } else {
             store32(value.reg().typedReg().gpr(), dest);
         }

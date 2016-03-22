@@ -312,7 +312,10 @@ class Assembler : public AssemblerX86Shared
     }
 
     CodeOffsetLabel movWithPatch(ImmWord word, Register dest) {
-        masm.movq_i64r(word.value, dest.code());
+        if (word.blind)
+            masm.movq_i64r_blnd(word.value, dest.code());
+        else
+            masm.movq_i64r_norm(word.value, dest.code());
         return CodeOffsetLabel(masm.currentOffset());
     }
     CodeOffsetLabel movWithPatch(ImmPtr imm, Register dest) {
@@ -329,13 +332,22 @@ class Assembler : public AssemblerX86Shared
         // smaller encodings.
         if (word.value <= UINT32_MAX) {
             // movl has a 32-bit unsigned (effectively) immediate field.
-            masm.movl_i32r((uint32_t)word.value, dest.code());
+            if (word.blind)
+                masm.movl_i32r_blnd((uint32_t)word.value, dest.code());
+            else
+                masm.movl_i32r_norm((uint32_t)word.value, dest.code());
         } else if ((intptr_t)word.value >= INT32_MIN && (intptr_t)word.value <= INT32_MAX) {
             // movq has a 32-bit signed immediate field.
-            masm.movq_i32r((int32_t)(intptr_t)word.value, dest.code());
+            if (word.blind)
+                masm.movq_i32r_blnd((int32_t)(intptr_t)word.value, dest.code());
+            else
+                masm.movq_i32r_norm((int32_t)(intptr_t)word.value, dest.code());
         } else {
             // Otherwise use movabs.
-            masm.movq_i64r(word.value, dest.code());
+            if (word.blind)
+                masm.movq_i64r_blnd(word.value, dest.code());
+            else
+                masm.movq_i64r_norm(word.value, dest.code());
         }
     }
     void movq(ImmPtr imm, Register dest) {

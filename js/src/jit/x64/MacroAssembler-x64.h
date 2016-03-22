@@ -186,9 +186,11 @@ class MacroAssemblerX64 : public MacroAssemblerX86Shared
     void storeValue(const Value& val, const T& dest) {
         jsval_layout jv = JSVAL_TO_IMPL(val);
         if (val.isMarkable()) {
+            printf("storeValue - Markable Value ImmWord(%lu) - 0x%lx\n", ImmWord(jv.asBits).value, ImmWord(jv.asBits).value);
             movWithPatch(ImmWord(jv.asBits), ScratchReg);
             writeDataRelocation(val);
         } else {
+            printf("storeValue - Non-Markable Value ImmWord(%lu) - 0x%lx\n", ImmWord(jv.asBits).value, ImmWord(jv.asBits).value);
             mov(ImmWord(jv.asBits), ScratchReg);
         }
         movq(ScratchReg, Operand(dest));
@@ -246,8 +248,15 @@ class MacroAssemblerX64 : public MacroAssemblerX86Shared
 
     void moveValue(const Value& val, Register dest) {
         jsval_layout jv = JSVAL_TO_IMPL(val);
-        movWithPatch(ImmWord(jv.asBits), dest);
-        writeDataRelocation(val);
+        if (val.isMarkable()){
+            printf("moveValue - Markable Value ImmWord(%lu) - 0x%lx\n", ImmWord(jv.asBits).value, ImmWord(jv.asBits).value);
+            movWithPatch(ImmWord(jv.asBits), dest);
+            writeDataRelocation(val);
+        } else {
+            printf("moveValue - Non-Markable Value ImmWord(%lu) - 0x%lx\n", ImmWord(jv.asBits).value, ImmWord(jv.asBits).value);
+            movq(ImmWord(jv.asBits, true), dest);
+        }
+        
     }
     void moveValue(const Value& src, const ValueOperand& dest) {
         moveValue(src, dest.valueReg());

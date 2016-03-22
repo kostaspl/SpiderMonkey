@@ -93,7 +93,9 @@ struct Imm32
     int32_t value;
 
     explicit Imm32(int32_t value) : value(value)
-    { }
+    { 
+        printf("Value Imm32(%d) - 0x%x\n", value, value);
+    }
 
     static inline Imm32 ShiftOf(enum Scale s) {
         switch (s) {
@@ -118,9 +120,12 @@ struct Imm32
 struct ImmWord
 {
     uintptr_t value;
+    bool blind;
 
-    explicit ImmWord(uintptr_t value) : value(value)
-    { }
+    explicit ImmWord(uintptr_t value, bool blind = false) : value(value), blind(blind)
+    { 
+        printf("Value ImmWord(%lu) - 0x%lx\n", value, value);
+    }
 };
 
 #ifdef DEBUG
@@ -158,6 +163,7 @@ struct ImmPtr
         // To make code serialization-safe, asm.js compilation should only
         // compile pointer immediates using AsmJSImmPtr.
         MOZ_ASSERT(CanUsePointerImmediates());
+        printf("Value ImmPtr(%p)\n", value);
     }
 
     template <class R>
@@ -165,6 +171,7 @@ struct ImmPtr
       : value(JS_FUNC_TO_DATA_PTR(void*, pf))
     {
         MOZ_ASSERT(CanUsePointerImmediates());
+        printf("Value ImmPtr(%p)\n", value);
     }
 
     template <class R, class A1>
@@ -172,6 +179,7 @@ struct ImmPtr
       : value(JS_FUNC_TO_DATA_PTR(void*, pf))
     {
         MOZ_ASSERT(CanUsePointerImmediates());
+        printf("Value ImmPtr(%p)\n", value);
     }
 
     template <class R, class A1, class A2>
@@ -179,6 +187,7 @@ struct ImmPtr
       : value(JS_FUNC_TO_DATA_PTR(void*, pf))
     {
         MOZ_ASSERT(CanUsePointerImmediates());
+        printf("Value ImmPtr(%p)\n", value);
     }
 
     template <class R, class A1, class A2, class A3>
@@ -186,6 +195,7 @@ struct ImmPtr
       : value(JS_FUNC_TO_DATA_PTR(void*, pf))
     {
         MOZ_ASSERT(CanUsePointerImmediates());
+        printf("Value ImmPtr(%p)\n", value);
     }
 
     template <class R, class A1, class A2, class A3, class A4>
@@ -193,6 +203,7 @@ struct ImmPtr
       : value(JS_FUNC_TO_DATA_PTR(void*, pf))
     {
         MOZ_ASSERT(CanUsePointerImmediates());
+        printf("Value ImmPtr(%p)\n", value);
     }
 
 };
